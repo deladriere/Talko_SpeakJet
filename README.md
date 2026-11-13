@@ -117,3 +117,75 @@ for a Queue burst is still pending.
 
 ZERO and NINE were both recognizable by ear. The C8 retest used the noise
 sweep optimization introduced in 0.5.
+
+
+## Talko-specific implementation: preserve during upstream updates
+
+The Talko firmware version (currently **Talko_SpeakJet 0.8**) is separate
+from the embedded SpeakJet engine version (**0.4.0**). This is a maintained
+RP2040 port, not an unmodified copy of the desktop emulator.
+
+| Area | Talko adaptation and reason |
+|---|---|
+| Synthesis arithmetic | `float` state, float math functions and `-fsingle-precision-constant` avoid the upstream double-precision synthesis cost on RP2040. |
+| Oscillators | `speakjet_sine.h` supplies a quarter-wave lookup for a 4096-step cycle. Oscillator phases stay bounded during long effects and repeats. |
+| Audio rate and output stage | `SJ_SAMPLE_RATE=8026`, matching the emulator's measured native chip tick. The analogue output model is advanced once per held sample with cached pole coefficients. Do not restore upstream's 48 kHz renderer accidentally. |
+| Expensive calculations | Master volume gain is cached until Volume changes. C8/C9 noise-filter sweeps are prepared once in `sj_new()` and survive `sj_power_on()` resets. |
+| RAM placement | `SJ_TALKO_RP2040` places the renderer and sine table in time-critical RAM sections. Keep the library flags in `library.json`. |
+| Core ownership | Core 1 owns the emulator, FIFO writes and rendering. Core 0 handles the panel, USB and PWM interrupt. Never access one emulator concurrently from both cores. |
+| Audio buffering | 64-sample blocks; 1024-sample duty ring; 128-sample startup prefill. Queue mode limits rendering ahead to 256 samples so a new gate can still influence an upcoming join. |
+| PWM output | GPIO 1 carries PWM at 12 carrier periods per audio sample. The interrupt only consumes prepared duties; synthesis stays outside interrupts. |
+| Live joining | `sj_join_pending()` revisits a phoneme's tail after appending live input between render blocks. Join only while the affected audio remains unrendered. This API is a Talko addition. |
+| Stream cancellation | Epoch-based gate cuts invalidate playing and waiting requests. The pending selection queue has 16 slots; a full queue reports `DROP`. |
+| Instrument identity | Nine Emy-style banks, the existing allophone/effect byte order, Emy effect labels and spoken digits, and the six bank-0 phrases. Preserve these byte streams during an engine-only update. |
+| Panel behavior | Settled quadrature inputs on GPIO 3/4, SOUND on ADC GPIO 26, inverted GATE/SPEAK on GPIO 2, mode switch on GPIO 14/15, display GPIO 5–12 at brightness 100. Speech/Gate/Queue retain their distinct retrigger and cutoff behavior. |
+| Startup | `talko_startup.h` and `ws2812.pio.h`: spoken version synchronized with the front display, rear RGB LED on GPIO 16, and bank-page decimal point off. |
+| Diagnostics | Nonblocking USB writes and per-stream mean/peak render times, late blocks and actual underrun counts. A late block alone does not prove an audible gap. |
+
+### Source layout
+
+- `src/main.cpp`: encoder, switch, SOUND selection, display and trigger handling.
+- `src/audio.cpp` / `audio.h`: core ownership, ring buffer, PWM, stream modes,
+  cancellation, startup speech, serial reports and Talko version.
+- `src/banks.h`: immutable selections, phrase bytes, digit dictionary and Emy labels.
+- `src/talko_startup.h` / `ws2812.pio.h`: display and rear LED startup sequence.
+- `lib/SpeakJet/src/speakjet.c`: adapted engine and Talko's live-join hook.
+- `lib/SpeakJet/src/speakjet_tables.c`: generated upstream sound parameters,
+  included by `speakjet.c`; do not compile it as a separate translation unit.
+- `lib/SpeakJet/src/speakjet.h`: engine API, engine version and native sample rate.
+- `lib/SpeakJet/src/speakjet_sine.h`: Talko oscillator lookup table.
+
+### Updating the upstream emulator
+
+1. Commit the working firmware and versioned UF2 first. Preserve earlier UF2s.
+2. Record the old and new upstream commits and read their code, table and API
+   differences together. Use a fixed commit, not a moving `main` dependency.
+3. Port the engine rules and table-layout changes together. Reapply each Talko
+   adaptation above; copying upstream `speakjet.c` and `.h` wholesale removes
+   the native renderer, optimizations and live-join API.
+4. Keep stored phrases and live Queue input on the same transition rules.
+   Incoming context can only change the unrendered future: late gates cannot
+   reproduce an anticipation that should already have sounded.
+5. Test all bank selections, repeated sounds, pauses, Speed/Fast/Slow, vowel
+   joins, nasal/stop closures, late arrivals, FIFO capacity and gate cuts.
+   Keep the original bank byte streams fixed for old/new comparisons.
+6. Build for `pico` (RP2040). Start with 64-sample blocks. Check peak time
+   against the actual PWM-derived block deadline, and check underruns with
+   serial open and closed. Larger buffers can hide lateness and increase
+   interaction latency; they are not a substitute for measuring CPU cost.
+7. Identify the connected USB target before uploading. Reconnect and verify
+   the Talko and engine versions after reboot. Capture the same phrases and
+   effects through the same audio interface/settings for before/after checks.
+8. Update the Talko version in `audio.h`, USB identity, startup, README and UF2
+   filename together; update all `SJ_VERSION*` macros and `library.json` for
+   the engine. Record measured results separately from desktop checks and
+   historical results. Commit the candidate with its exact source provenance.
+
+### Current limitations
+
+SPEED, PITCH, FX and ERROR are not implemented as panel controls in 0.8.
+Serial currently sends diagnostic `PLAY`/`QUEUE`/`RESULT` lines rather than
+standalone spoken labels or playback articulation events; Console lip sync
+is not supported by this baseline. Audio is native-rate PWM, so it does not
+reproduce all high-frequency images of upstream's 48 kHz desktop output.
+The historical measurements above do not establish 0.8's worst-case timing.
