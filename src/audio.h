@@ -1,8 +1,8 @@
 #pragma once
 #include "panel_logic.h"
 #include <stdint.h>
-constexpr uint8_t VersionMajor=0, VersionMinor=9, VersionPatch=2;
-constexpr const char *FirmwareVersion="0.9.2";
+constexpr uint8_t VersionMajor=0, VersionMinor=9, VersionPatch=3;
+constexpr const char *FirmwareVersion="0.9.3";
 struct PanelControls {
   uint16_t pitch=2048,speed=2048,fx=0;
   Fx effect=Fx::Delay;

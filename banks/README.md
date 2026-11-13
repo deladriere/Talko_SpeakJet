@@ -1,8 +1,21 @@
 # Talko_SpeakJet bank catalogue
 
-`catalogue.json` is the editable source for the ten banks. Curated banks 0, 2,
-3, 4, 7, 8 and 9 each contain 16 entries; the native banks keep their full
-ranges. SOUND/CV scans entries in the listed order. Regenerate with:
+`catalogue.json` is the editable source for fourteen banks. Curated banks 0–6
+each contain 16 entries. The original Emy groups follow at 7–13, displayed as
+7, 8, 9, A, b, C and d. SOUND/CV scans entries in the listed order. Keep these
+seven groups separate and in their original order and ranges:
+
+| Display | Group | Native range | Entries |
+|---|---|---|---:|
+| 7 | Vowels | 128–139 | 12 |
+| 8 | Voiced | 128–181 | 54 |
+| 9 | Voiced Stop | 170–181 | 12 |
+| A | Voiceless | 182–199 | 18 |
+| b | All | 128–199 | 72 |
+| C | All Effects | 200–254 | 55 |
+| d | DTMF | 240–251 | 12 |
+
+Regenerate with:
 
 ```sh
 python3 scripts/generate_banks.py
@@ -43,6 +56,8 @@ first ten entries of `spokenDigits` in numeric order: startup uses them too.
 Document the source for every manual override and run the generator and host
 suite after editing.
 
-Bank 5 retains every allophone; bank 6 retains every native effect, including
-DTMF. The former overlapping voiced/stop/voiceless/DTMF panel banks are replaced
-by vocabulary and syllable banks. The long pangram is absent from this release.
+Bank 5 now holds ZERO–FIFTEEN and is marked `role: numbers` in the catalogue.
+The generator uses that role for the startup table rather than a fixed bank
+number. It checks the first ten spoken labels remain ZERO–NINE in order.
+All seven Emy groups are enforced by generation checks. The long pangram is
+absent; overlapping native groups are intentional and must be preserved.

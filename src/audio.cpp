@@ -1,7 +1,9 @@
 #include "audio.h"
 #include "banks.h"
 #include "dsp.h"
+#ifndef TALKO_CONSOLE_HOST
 #include "talko_startup.h"
+#endif
 
 #include <Arduino.h>
 #include <atomic>
@@ -66,7 +68,7 @@ PanelControls panelSnapshot;
 PanelControls injectedControls;
 bool injected=false;
 #endif
-bool panelPending=true;
+bool panelPending=false;
 bool panelMonitor=false;
 Dsp::Effects effects;
 Dsp::Freeze freeze;
@@ -488,7 +490,7 @@ void setPanelControls(const PanelControls &controls,bool announce) {
   if(active.speed!=oldSpeed){oldSpeed=active.speed;rateScale=Panel::scale(active.speed);}
   static uint32_t lastPanelAt=0;
   if(panelMonitor && millis()-lastPanelAt>=100){panelPending=true;lastPanelAt=millis();}
-  panelSnapshot=controls;panelPending|=announce;
+  panelSnapshot=controls;panelPending|=announce && panelMonitor;
   performance.store((uint32_t(pitchScale)<<16)|rateScale,std::memory_order_relaxed);
   speedControl.store(active.speed,std::memory_order_relaxed);
   effectControl.store((uint32_t(active.effect)<<16)|active.fx,std::memory_order_relaxed);
@@ -579,7 +581,7 @@ void serviceConsole() {
   static char line[256];
   static size_t sent = 0;
   static size_t length = 0;
-  static bool connected = false;
+  static bool statusPending = false;
   Report report;
   static Report lastCompleted{};
   static bool haveLast = false, requestLast = false;
@@ -593,7 +595,9 @@ void serviceConsole() {
   static bool commandOverflow = false;
   constexpr char request[] = "\x1eSAM\x1f";
   if (!Serial) {
-    connected = false;
+    statusPending = false;
+    panelPending = panelMonitor = false;
+    statsEnabled = false;
     sent = length;
     while (queue_try_remove(&reports, &report)) {
       if (report.event == Event::Done || report.event == Event::Cut) {
@@ -633,10 +637,10 @@ void serviceConsole() {
         }else
 #endif
         if (!strcmp(command, "CUT")) stopAudio();
-        else if (!strcmp(command, "STATUS")) {connected = false;panelPending=true;}
+        else if (!strcmp(command, "STATUS")) {statusPending = true;panelPending=true;}
         else if (!strcmp(command,"PANEL")) panelPending=true;
         else if (!strcmp(command,"MONITOR ON")) panelMonitor=true;
-        else if (!strcmp(command,"MONITOR OFF")) panelMonitor=false;
+        else if (!strcmp(command,"MONITOR OFF")) {panelMonitor=false;panelPending=false;}
         else if (!strcmp(command,"STATS ON")) statsEnabled=true;
         else if (!strcmp(command,"STATS OFF")) statsEnabled=false;
         else if (!strcmp(command, "LAST")) requestLast = true;
@@ -675,7 +679,7 @@ void serviceConsole() {
 
   if (sent == length) {
     int count;
-    if (!connected) {
+    if (statusPending) {
       count = snprintf(line, sizeof(line),
                        "Talko_SpeakJet %s build=%s engine=%s sample_hz=%u "
                        "block_samples=%u budget_us=%u prefill_samples=%u\r\n",
@@ -688,7 +692,7 @@ void serviceConsole() {
                        SJ_VERSION,
                        unsigned(SJ_SAMPLE_RATE), BlockSamples, blockBudgetUs,
                        PrefillSamples);
-      connected = true;
+      statusPending = false;
     } else if (panelPending) {
       panelPending=false;
       count=snprintf(line,sizeof(line),"PANEL mode=%s pins=%u%u pitch=%u speed=%u fx=%u effect=%u error=%u sound=%u buffered=%u frozen=%u\r\n",
@@ -697,7 +701,10 @@ void serviceConsole() {
         unsigned(panelSnapshot.effect),unsigned(panelSnapshot.error),unsigned(panelSnapshot.sound),
         unsigned(nativeBuffered()),unsigned(audioFrozen()));
     } else if (queue_try_remove(&playbackEvents, &playback)) {
-      if (!playback.label) count = snprintf(line, sizeof(line), "STOP\r\n");
+      if (!playback.label) {
+        if (!statsEnabled && !mouthEnabled) return;
+        count = snprintf(line, sizeof(line), "STOP\r\n");
+      }
       else {
         const uint bank = playback.label >> 8, item = (playback.label & 255) - 1;
         const Request label{0, uint8_t(bank), uint8_t(item), PlaybackMode::Speech};

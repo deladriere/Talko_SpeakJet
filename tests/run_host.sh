@@ -24,3 +24,6 @@ fi
 "$test_build/dsp"
 "$cxx" -std=c++17 $test_flags -Itests/stubs tests/panel_test.cpp -o "$test_build/panel"
 "$test_build/panel"
+
+"$cxx" -std=c++17 $test_flags -Itests/stubs -Ilib/SpeakJet/src tests/serial_test.cpp src/dsp.cpp "$test_build/engine.o" -o "$test_build/serial"
+"$test_build/serial"

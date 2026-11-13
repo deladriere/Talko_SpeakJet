@@ -33,7 +33,7 @@ int main(){
   switchMode(false,true);assert(observed.mode==PlaybackMode::Speech);
   gate(true);before=cuts;gate(false);assert(cuts==before);assert(triggered.back().mode==PlaybackMode::Speech);
   switchMode(true,false);assert(observed.mode==PlaybackMode::Queue);
-  bankCursor=1;testAdc[26]=0;advance(100);gate(true);gate(false);assert(triggered.back().item==0);
+  bankCursor=7;testAdc[26]=0;advance(100);gate(true);gate(false);assert(triggered.back().item==0);
   testAdc[26]=4095;advance(150);before=cuts;gate(true);gate(false);
   assert(cuts==before && triggered.back().mode==PlaybackMode::Queue && triggered.back().item==11);
   testAdc[29]=4095;testAdc[28]=0;testAdc[27]=3300;advance(200);
@@ -49,5 +49,14 @@ int main(){
   assert(bankCursor==BankCount-1);
   for(unsigned state:{2u,0u,1u,3u}){testPins[3]=state&2;testPins[4]=state&1;encoderInterrupt();}
   assert(bankCursor==BankCount-2);
+
+  // Every group, including A/b/C/d, must be reachable, displayed and triggered.
+  for(uint8_t b=0;b<BankCount;++b){
+    bankCursor=b;advance(5);uint8_t shown=0;
+    for(unsigned bit=0;bit<7;++bit)if(testPwm[5+bit])shown|=1u<<bit;
+    assert(shown==BankGlyphs[b]);
+    gate(true);gate(false);assert(triggered.back().bank==b);
+    assert(triggered.back().item==banks[b].count-1);
+  }
   puts("Actual panel loop: three switch positions, gate cuts, queued selections, all ADCs, FX page, ERROR and bank reversal OK");
 }

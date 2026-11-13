@@ -2,13 +2,13 @@ from pathlib import Path
 import serial,serial.tools.list_ports,time,re,json,sys,argparse
 parser=argparse.ArgumentParser()
 parser.add_argument("--serial-id",required=True)
-parser.add_argument("--output",type=Path,default=Path("validation/0.9.2"))
+parser.add_argument("--output",type=Path,default=Path("validation/0.9.3"))
 parser.add_argument("--quick",action="store_true")
 args=parser.parse_args()
 out=args.output;out.mkdir(parents=True,exist_ok=True)
 ports=[p for p in serial.tools.list_ports.comports() if p.serial_number==args.serial_id]
 assert len(ports)==1
-assert ports[0].product=='Talko_SpeakJet 0.9.2',ports[0].product
+assert ports[0].product=='Talko_SpeakJet 0.9.3',ports[0].product
 s=serial.Serial(ports[0].device,115200,timeout=.1)
 log=[];results=[]
 def read_until(predicate,timeout=25):
@@ -31,7 +31,7 @@ def run(command,timeout=25):
     if label:record['label']=label[1]
     if command.startswith('PLAY '):
         _,bank,item=command.split();assert record['bank']==bank and record['item']==item
-    elif command.startswith('RAW '):assert record['bank']=='11'
+    elif command.startswith('RAW '):assert record['bank']=='15'
     results.append(record)
     return record
 try:
@@ -39,12 +39,12 @@ try:
     banner=read_until(lambda l:l.startswith('Talko_SpeakJet'))
     assert 'engine=0.4.3' in banner
     if '--quick' not in sys.argv:
-        counts=[16,12,16,16,16,72,55,16,16,16]
+        counts=[16,16,16,16,16,16,16,12,54,12,18,72,55,12]
         for bank,count in enumerate(counts):
             for item in range(1,count+1):run(f'PLAY {bank} {item}')
             print('Completed bank',bank,'total',len(results),flush=True)
     else:
-        for b,i in ((0,1),(2,16),(3,10),(4,12),(6,39),(6,40),(6,55),(7,16),(8,1),(8,16),(9,15)):
+        for b,i in ((0,1),(1,16),(2,10),(3,12),(4,16),(5,1),(5,16),(6,15),(12,39),(12,40),(12,55),(13,12)):
             run(f'PLAY {b} {i}')
     for seq in ('128 137','141 179 137','132 191 132','187 187','132 8 187 8 187 134',
                 '21 108 141 179 137','21 118 128 147 129','132 2 132'):
@@ -52,7 +52,7 @@ try:
     # Closely spaced live vowel triggers: repeated labels must each be emitted.
     before=len(log)
     for item in (1,10,1,10,1,10,1,10,1,10,1,10):
-        s.write(f'QUEUE 1 {item}\n'.encode());s.flush();time.sleep(.04)
+        s.write(f'QUEUE 7 {item}\n'.encode());s.flush();time.sleep(.04)
     q=read_until(lambda l:l.startswith('RESULT '),12)
     record=dict(re.findall(r'(\w+)=([^ ]+)',q));record['command']='12 live vowel gates at 25 Hz';results.append(record)
     queue_log=log[before:]
@@ -60,7 +60,7 @@ try:
     print('Queue spoken labels',labels,flush=True)
     assert labels==12,labels
     # Cut invalidates both the playing stream and queued requests.
-    s.write(b'QUEUE 9 15\n');time.sleep(.05);s.write(b'QUEUE 0 1\nCUT\n')
+    s.write(b'QUEUE 6 15\n');time.sleep(.05);s.write(b'QUEUE 0 1\nCUT\n')
     cut=read_until(lambda l:l.startswith('RESULT ') and 'status=cut' in l)
     assert 'STOP' in log[-20:]
     # Request current pose at rest and speech articulation on the same framed protocol as SAM.

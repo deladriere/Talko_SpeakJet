@@ -189,14 +189,6 @@
     },
     {
       "id": 1,
-      "name": "Vowels",
-      "native": [
-        128,
-        139
-      ]
-    },
-    {
-      "id": 2,
       "name": "Performance commands",
       "entries": [
         {
@@ -375,7 +367,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "name": "Synth laboratory",
       "entries": [
         {
@@ -563,7 +555,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "name": "Space",
       "entries": [
         {
@@ -742,23 +734,7 @@
       ]
     },
     {
-      "id": 5,
-      "name": "All allophones",
-      "native": [
-        128,
-        199
-      ]
-    },
-    {
-      "id": 6,
-      "name": "Chip sounds",
-      "native": [
-        200,
-        254
-      ]
-    },
-    {
-      "id": 7,
+      "id": 4,
       "name": "Rhythmic syllables",
       "entries": [
         {
@@ -891,7 +867,7 @@
       ]
     },
     {
-      "id": 8,
+      "id": 5,
       "name": "Numbers",
       "entries": [
         {
@@ -1072,10 +1048,11 @@
           ],
           "source": "cmudict: fifteen"
         }
-      ]
+      ],
+      "role": "numbers"
     },
     {
-      "id": 9,
+      "id": 6,
       "name": "Short transmissions",
       "entries": [
         {
@@ -1368,6 +1345,62 @@
           ],
           "source": "cmudict: end of line"
         }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Vowels",
+      "native": [
+        128,
+        139
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Voiced",
+      "native": [
+        128,
+        181
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Voiced Stop",
+      "native": [
+        170,
+        181
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Voiceless",
+      "native": [
+        182,
+        199
+      ]
+    },
+    {
+      "id": 11,
+      "name": "All",
+      "native": [
+        128,
+        199
+      ]
+    },
+    {
+      "id": 12,
+      "name": "All Effects",
+      "native": [
+        200,
+        254
+      ]
+    },
+    {
+      "id": 13,
+      "name": "DTMF",
+      "native": [
+        240,
+        251
       ]
     }
   ]

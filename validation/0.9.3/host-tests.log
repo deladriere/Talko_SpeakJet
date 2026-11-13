@@ -1,0 +1,26 @@
+14 banks, 347 selections, 16 entries per curated bank; longest entry 16/64 bytes
+347 bank selections, tagged/plain sample parity, 24 modifier/Speed streams and FIFO bounds OK
+Live pairs accepted=5757 safely separate=399; late arrival and reset OK
+ok
+Live pitch independent of duration; quarter/four-times rate, slow native joins and half-full flow control OK
+All FX dry/switch-tail behavior, ERROR loop/rate, pot scales and switch decoding OK
+tests/panel_test.cpp:7:19: warning: unused variable 'Digits' [-Wunused-const-variable]
+    7 | constexpr uint8_t Digits[]={0x3f,6,0x5b,0x4f,0x66,0x6d,0x7d,7,0x7f,0x6f};
+      |                   ^~~~~~
+1 warning generated.
+Actual panel loop: three switch positions, gate cuts, queued selections, all ADCs, FX page, ERROR and bank reversal OK
+In file included from tests/serial_test.cpp:7:
+tests/../src/audio.cpp:218:40: warning: missing field 'blocks' initializer [-Wmissing-field-initializers]
+  218 |       Report queued{next, Event::Queued};
+      |                                        ^
+tests/../src/audio.cpp:231:37: warning: missing field 'blocks' initializer [-Wmissing-field-initializers]
+  231 |   Report report{request, Event::Play};
+      |                                     ^
+tests/../src/audio.cpp:460:49: warning: missing field 'blocks' initializer [-Wmissing-field-initializers]
+  460 |     const Report dropped{request, Event::Dropped};
+      |                                                 ^
+tests/serial_test.cpp:18:56: warning: missing field 'blocks' initializer [-Wmissing-field-initializers]
+   18 |  Report report{{0,0,0,PlaybackMode::Speech},Event::Done};assert(queue_try_add(&reports,&report));pump();assert(Serial.output.empty());
+      |                                                        ^
+4 warnings generated.
+Actual serial service: labels only by default, no banner/PANEL/STOP, explicit diagnostics/animation, reconnect reset and bounded writes OK

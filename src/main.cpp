@@ -12,6 +12,8 @@ namespace {
 constexpr uint ErrorPin=0,GatePin=2,EncoderA=3,EncoderB=4,SegmentA=5,DecimalPoint=12;
 constexpr uint SelectPin=13,ModeB=14,ModeA=15,SoundPin=26,FxPin=27,SpeedPin=28,PitchPin=29;
 constexpr uint Brightness=100;
+constexpr uint8_t BankGlyphs[]={0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71};
+static_assert(BankCount<=sizeof(BankGlyphs));
 constexpr uint8_t FxGlyphs[]={0x40,0x5c,0x50,0x5e,0x39,0x6d,0x38,0x76};
 static_assert(sizeof(FxGlyphs)==unsigned(Fx::Count));
 constexpr uint8_t ModeGlyphs[]={0x6d,0x3d,0x67};
@@ -118,7 +120,7 @@ void loop(){
     for(unsigned n=0;n<opens;++n)triggerAudio(bank,Panel::selection(soundPot.value(),banks[bank].count),mode);
   }
   if(moved||selected||errorChanged||encoderMoved||modeChanged||events||audioBusy()||audioFrozen()||errorButton.held)lastActivity=now;
-  uint8_t glyph=fxPage?FxGlyphs[effect]:TalkoStartup::Digits[bank];
+  uint8_t glyph=fxPage?FxGlyphs[effect]:BankGlyphs[bank];
   bool dot=fxPage;
   uint brightness=Brightness;
   if(int32_t(modeShownUntil-now)>0)glyph=ModeGlyphs[unsigned(mode)];
