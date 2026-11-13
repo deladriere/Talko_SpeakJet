@@ -26,7 +26,7 @@ static_assert(BankCount <= sizeof(TalkoStartup::Digits));
 uint8_t selectedBank = 0;
 uint8_t lastEncoderState = 0;
 int8_t encoderSteps = 0;
-volatile int encoderDetents = 0;
+volatile uint8_t encoderBank = 0;
 int filteredSound = 0;
 uint32_t lastPotRead = 0;
 bool gateWasClosed = false;
@@ -65,7 +65,7 @@ void encoderInterrupt() {
   encoderSteps += transitions[(lastEncoderState << 2) | state];
   lastEncoderState = state;
   if (encoderSteps == 4 || encoderSteps == -4) {
-    encoderDetents += encoderSteps > 0 ? 1 : -1;
+    encoderBank = constrain(int(encoderBank) + (encoderSteps > 0 ? 1 : -1), 0, BankCount - 1);
     encoderSteps = 0;
   }
 }
@@ -120,14 +120,12 @@ void loop() {
   }
 
   uint32_t interruptState = save_and_disable_interrupts();
-  int movement = encoderDetents;
-  encoderDetents = 0;
+  selectedBank = encoderBank;
   uint8_t events = gateEvents;
   gateEvents = 0;
   uint32_t pins = gpio_get_all();
   restore_interrupts(interruptState);
 
-  selectedBank = constrain(int(selectedBank) + movement, 0, BankCount - 1);
   constexpr uint32_t modePins = (1u << ModeA) | (1u << ModeB);
   const uint32_t switchPins = pins & modePins;
   PlaybackMode mode = PlaybackMode::Speech;

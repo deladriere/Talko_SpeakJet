@@ -1,0 +1,13 @@
+Talko_SpeakJet 0.9 mode=native engine=0.4.3 sample_hz=8026 block_samples=64 budget_us=7974 prefill_samples=128
+ZERO
+STOP
+POINT
+STOP
+NINE
+STOP
+PLAY bank=9 item=1 label=ZERO mode=speech
+RESULT bank=9 item=1 label=ZERO status=done blocks=70 avg_us=6056 peak_us=8124 budget_us=7974 late_blocks=2 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=11 label=POINT mode=speech
+RESULT bank=9 item=11 label=POINT status=done blocks=63 avg_us=6070 peak_us=8198 budget_us=7974 late_blocks=3 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=10 label=NINE mode=speech
+RESULT bank=9 item=10 label=NINE status=done blocks=53 avg_us=6373 peak_us=8140 budget_us=7974 late_blocks=5 underrun_events=0 underrun_samples=0 mode=speech

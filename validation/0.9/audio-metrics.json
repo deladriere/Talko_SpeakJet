@@ -1,0 +1,38 @@
+{
+  "baseline-0.8-startup": {
+    "sample_rate": 44100,
+    "channels": 2,
+    "full_capture_seconds": 15.998548752834466,
+    "clip_seconds": 1.49,
+    "peak_dbfs": -6.448177256129521,
+    "full_scale_samples": 0,
+    "activity_groups_seconds": [
+      [
+        0.34,
+        1.07
+      ],
+      [
+        4.27,
+        5.61
+      ]
+    ]
+  },
+  "candidate-0.9-startup": {
+    "sample_rate": 44100,
+    "channels": 2,
+    "full_capture_seconds": 15.998548752834466,
+    "clip_seconds": 1.69,
+    "peak_dbfs": -6.457092147810126,
+    "full_scale_samples": 0,
+    "activity_groups_seconds": [
+      [
+        0.36,
+        1.1
+      ],
+      [
+        4.96,
+        6.5
+      ]
+    ]
+  }
+}

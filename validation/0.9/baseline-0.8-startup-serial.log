@@ -1,0 +1,7 @@
+Talko 2 SpeakJet bench v0.8 mode=native engine=0.4.0 sample_hz=8026 block_samples=64 budget_us=7974 prefill_samples=128
+PLAY bank=9 item=1 label=ZERO mode=speech
+RESULT bank=9 item=1 label=ZERO status=done blocks=66 avg_us=5487 peak_us=7675 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=11 label=POINT mode=speech
+RESULT bank=9 item=11 label=POINT status=done blocks=59 avg_us=5365 peak_us=7294 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=9 label=EIGHT mode=speech
+RESULT bank=9 item=9 label=EIGHT status=done blocks=40 avg_us=5047 peak_us=6616 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech

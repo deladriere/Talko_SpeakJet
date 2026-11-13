@@ -1,0 +1,9 @@
+{
+  "streams": 262,
+  "underrun_samples": 0,
+  "late_blocks": 106,
+  "peak_us": 9264,
+  "maximum_stream_mean_us": 6991,
+  "block_budget_us": 7974,
+  "uf2_sha256": "2d67d67b41a642fb999c616cf1af18baf1d294c6aa4953f3842ffe0041a3eb6b"
+}

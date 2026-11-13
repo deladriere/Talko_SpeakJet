@@ -1,0 +1,18 @@
+#!/bin/sh
+set -eu
+cd "$(dirname "$0")/.."
+test_build=$(mktemp -d "${TMPDIR:-/tmp}/talko-speakjet-host.XXXXXX")
+trap 'rm -rf "$test_build"' EXIT HUP INT TERM
+cc=${CC:-cc}
+cxx=${CXX:-c++}
+test_flags="-O2 -Wall -Wextra -ffp-contract=off"
+if [ "${SANITIZE:-0}" = 1 ]; then
+  test_flags="$test_flags -fsanitize=address,undefined"
+fi
+"$cc" -std=c99 $test_flags -Werror -Wdouble-promotion -c lib/SpeakJet/src/speakjet.c -o "$test_build/engine.o"
+"$cxx" -std=c++17 $test_flags tests/bank_test.cpp "$test_build/engine.o" -o "$test_build/banks"
+"$test_build/banks"
+"$cc" -std=c99 $test_flags tests/live_join_test.c -lm -o "$test_build/live"
+"$test_build/live"
+"$cc" -std=c99 $test_flags tests/upstream_test.c -lm -o "$test_build/upstream"
+"$test_build/upstream"

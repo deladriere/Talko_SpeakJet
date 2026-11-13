@@ -42,9 +42,9 @@ extern "C" {
 
 /* library version */
 #define SJ_VERSION_MAJOR 0
-#define SJ_VERSION_MINOR 3
-#define SJ_VERSION_PATCH 0
-#define SJ_VERSION "0.4.0"
+#define SJ_VERSION_MINOR 4
+#define SJ_VERSION_PATCH 3
+#define SJ_VERSION "0.4.3"
 
 /* Native measured SpeakJet tick rate, also used for Talko output. */
 #define SJ_SAMPLE_RATE 8026
@@ -99,6 +99,12 @@ void sj_reset(sj_chip *sj);
 /* fill buf with the next n samples of output, at SJ_SAMPLE_RATE, in the
  * range -1 to 1. returns true if the chip is producing sound */
 bool sj_render(sj_chip *sj, float *buf, size_t n);
+
+/* Talko playback metadata. byte_offset is the absolute command byte offset
+ * since power-on; code is the held sample's allophone/effect, or 0 for silence.
+ * Tag the held output, not the tick rendered ahead of it. */
+typedef struct sj_trace { uint32_t byte_offset; uint8_t code; } sj_trace;
+bool sj_render_tagged(sj_chip *sj, float *buf, sj_trace *trace, size_t n);
 
 /* the mnemonic of an allophone (128 to 199) or sound effect (200 to 254),
  * e.g. "IY" or "M1". NULL for any other code */

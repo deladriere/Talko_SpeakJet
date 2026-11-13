@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 constexpr uint8_t VersionMajor = 0;
-constexpr uint8_t VersionMinor = 8;
+constexpr uint8_t VersionMinor = 9;
 
 enum class PlaybackMode : uint8_t { Speech, Gate, Queue };
 

@@ -5,7 +5,7 @@
  * Copyright (c) 2026 Andrew Davie
  * SPDX-License-Identifier: MIT
  *
- * Talko RP2040 adaptation: single-precision synthesis, cached volume gain,
+ * Talko RP2040 adaptation: upstream 0.4.3, single-precision synthesis, cached volume gain,
  * a sine lookup table, native-rate output and cached noise sweeps.
  * Build with GCC's -fsingle-precision-constant.
  */
@@ -45,14 +45,14 @@
 #include <math.h>
 
 /* strict ISO C (-std=c99 on glibc) leaves these out of math.h */
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
+#ifndef SJ_PI
+#define SJ_PI 3.14159265358979323846f
 #endif
-#ifndef M_LN2
-#define M_LN2 0.69314718055994530942
+#ifndef SJ_LN2
+#define SJ_LN2 0.69314718055994530942f
 #endif
-#ifndef M_LN10
-#define M_LN10 2.30258509299404568402
+#ifndef SJ_LN10
+#define SJ_LN10 2.30258509299404568402f
 #endif
 #include <stdlib.h>
 #include <string.h>
@@ -64,39 +64,50 @@
  * arithmetic assumes 8000: its tones come out Fs/8000 sharp on both units, and
  * the voicing period is floorf(8000 / Pitch) + 1 ticks */
 #define RATE ((float)SJ_SAMPLE_RATE)
-#define NOMINAL 8000.0
+#define NOMINAL 8000.0f
 #ifndef NHP_FC
-#define NHP_FC 400.0 /* an allophone's noise high pass, Hz */
+#define NHP_FC 400.0f /* an allophone's noise high pass, Hz */
 #endif
 #ifndef NSWEEP_HPK
-#define NSWEEP_HPK (1.0 / (1.0 + 2.0 * M_PI * 150.0 / 8000.0)) /* the swept noise's high pass (C8, C9): 150 Hz */
+#define NSWEEP_HPK (1.0f / (1.0f + 2.0f * SJ_PI * 150.0f / 8000.0f)) /* the swept noise's high pass (C8, C9): 150 Hz */
+#endif
+#ifndef JOIN_CLOSURE
+#define JOIN_CLOSURE 45.0f /* a stop's closure after a sound, at least this, ms (Man Goes Down's GO) */
+#define NASAL_BAR 0.15848931924611134f /* a voiced stop's bar after a nasal: 16 dB under its own level */
+#define SLOW_GLIDE_ON 25.0f /* ms: see the ASSUMPTION at its use */
+#define JOIN_A 66.9f /* a vowel or glide into a vowel or glide: cut JOIN_A - JOIN_K * (F1+F2 ERB distance) ms */
+#define JOIN_K 6.9f
+#define NASAL_FADE 0.6513f /* and the nasal fades into it over this share of the closure */
+#define NASAL_CLOSURE 38.0f /* a voiced stop's closure after a nasal, ms (before Speed and Slow) */
+#define NASAL_RAMP 10.0f /* and its release rises over this, ms */
+#define NASAL_RAMP_FROM 0.316228f /* from 10 dB down */
 #endif
 #ifndef NHP_TWO
 #define NHP_TWO 1 /* two stages (1) or one (0) */
 #endif
-#define FRIC_RAMP 3.0 /* an unvoiced fricative's attack and release, ms */
-#define THUMP_MS 16.0 /* a sibilant's starting burst of low noise: it fades out over this, ms */
-#define FXBURST_MS 5.0 /* an effect's starting click: it fades out over this, ms (220 B0: the chip's is ~5 ms, flat to 1.5 kHz and beyond) */
-#define THUMP_HZ 800.0 /* and is low-passed here */
-#define NASAL_ATTACK 25.0 /* a nasal's attack, ms (the vowels': T.attack) */
+#define FRIC_RAMP 3.0f /* an unvoiced fricative's attack and release, ms */
+#define THUMP_MS 16.0f /* a sibilant's starting burst of low noise: it fades out over this, ms */
+#define FXBURST_MS 5.0f /* an effect's starting click: it fades out over this, ms (220 B0: the chip's is ~5 ms, flat to 1.5 kHz and beyond) */
+#define THUMP_HZ 800.0f /* and is low-passed here */
+#define NASAL_ATTACK 25.0f /* a nasal's attack, ms (the vowels': T.attack) */
 #ifndef BAR_UP
-#define BAR_UP 0.12 /* a voiced stop's bar: its upper formants at this fraction of the release's */
+#define BAR_UP 0.12f /* a voiced stop's bar: its upper formants at this fraction of the release's */
 #endif
 #ifndef BAR_CLICK
-#define BAR_CLICK 0.0 /* and the click it opens on, ms */
+#define BAR_CLICK 0.0f /* and the click it opens on, ms */
 #endif
-#define AM_STEADY 0.006 /* a plain tone's level holds to 0.01-0.09 dB rms in its middle (VoxRecord, both units: the DTMF tones, B0, B3, R7, R9) */
-#define AM_DEPTH 0.1 /* the effects' tones hold their pitch (both units: 0.03-0.13 % rms on the DTMF tones and the robots' carriers) */
-#define AM_RATE 0.05 /* and the energy round their lines is a slow wobble in level, 10 % rms, spread to about 64 Hz */
-#define SLEW 0.078 /* the effects' bed, measured: grows with the tone's frequency on both units (220 B0, 227 B7 against 215 A5) */
-#define LPF_ZERO 14000.0 /* and one real zero, Hz: the images above 8 kHz (every effect, both units) */
-#define BED_POLE 0.6909588478246612 /* up to about 1.5 kHz, then with the tone's level alone (one pole: the DTMF digits against 220 B0, 221 B1, 228 B8) */
-#define SCP_DB 5.9 /* a register tone's level: VoxProbe 9, both units, the 1000 Hz tone at volume 31 stands 3.1-3.6 dB over 235 C5
+#define AM_STEADY 0.006f /* a plain tone's level holds to 0.01-0.09 dB rms in its middle (VoxRecord, both units: the DTMF tones, B0, B3, R7, R9) */
+#define AM_DEPTH 0.1f /* the effects' tones hold their pitch (both units: 0.03-0.13 % rms on the DTMF tones and the robots' carriers) */
+#define AM_RATE 0.05f /* and the energy round their lines is a slow wobble in level, 10 % rms, spread to about 64 Hz */
+#define SLEW 0.078f /* the effects' bed, measured: grows with the tone's frequency on both units (220 B0, 227 B7 against 215 A5) */
+#define LPF_ZERO 14000.0f /* and one real zero, Hz: the images above 8 kHz (every effect, both units) */
+#define BED_POLE 0.6909588478246612f /* up to about 1.5 kHz, then with the tone's level alone (one pole: the DTMF digits against 220 B0, 221 B1, 228 B8) */
+#define SCP_DB 5.9f /* a register tone's level: VoxProbe 9, both units, the 1000 Hz tone at volume 31 stands 3.1-3.6 dB over 235 C5
                      * and 241 D1, which put it 4.9 and 6.9 dB above the effects' tone scale; the mean */
-#define WANDER_DEPTH 0.015 /* 252 M0, both units: its line wanders 1.45-1.59 % rms */
-#define WANDER_RATE 0.055 /* spread to about 70 Hz (a one-pole low-pass) */
+#define WANDER_DEPTH 0.015f /* 252 M0, both units: its line wanders 1.45-1.59 % rms */
+#define WANDER_RATE 0.055f /* spread to about 70 Hz (a one-pole low-pass) */
 
-#define TICKS(ms) ((int)((ms) * RATE / 1000.0 + 0.5))
+#define TICKS(ms) ((int)((ms) * RATE / 1000.0f + 0.5f))
 
 /* the constants of the model. the values are what the recordings gave; a
  * build with -DSJ_TUNE reads overrides from the SJ_TUNE environment variable
@@ -130,8 +141,14 @@ static struct tune {
   float copy_extra;              /* a Repeat copy adds this to the manual's length, ms */
   float copy_closure;            /* a stop's Repeat copy opens on this much silence, ms */
   float bend_hz;                 /* Bend step, Hz */
-  float pause[7];                /* the pauses, ms: P1 and P4 measured (VoxProbe 8), the rest the manual's */
-} T = {0.5, 58, 1609, 0.462, 35, 30, 1, 25, 0, 0, 0, 0, 0, 0, 35, 25, 30, 0.4, 15, 30, 162, 48, 147, 33, 2.0 / 3.0, 4.0 / 3.0, 0, 20, 44, {0, 90, 200, 700, 15, 60, 90}};
+  float pause[7];                /* the pauses, ms (VoxProbe 1 section 5, AW Pn AW x3, both units, 2600 and Stella;
+                                   * Man Goes Down P1 and P2's gaps): P0 leaves ~20 ms, P3 P5 P6 run 52/30/31 ms under
+                                   * the manual's 700 60 90, P1 P2 P4 are the manual's (AW's own fade-in and -out leave
+                                   * every AW Pn AW gap ~19 ms under the chip's; the phrases' gaps between stops and
+                                   * hisses match these) */
+} T = {0.5f, 58, 1609, 0.462f, 35, 30, 1, 25, 0, 0, 0, 0, 0, 0, 35, 25, 30, 0.4f, 15, 30, 162, 48, 147, 33, 2.0f / 3.0f, 4.0f / 3.0f, 0, 20, 44, {20, 90, 188, 648, 15, 30, 59}};
+/* P2 188 ms, not 200 (2026-11-08, VoxProbe 13 section 9, both units, placement fixed: the second AW of AW P2 AW starts
+ * 10-20 ms after the chips' at every Speed and Pitch; section 9 12.0 -> 9.4 ms) */
 
 #ifdef SJ_TUNE
 #include <stdio.h>
@@ -221,6 +238,11 @@ typedef struct fxpart {
 #define MAX_SEGMENTS 32 /* C7 is seven chirps with gaps between */
 
 
+typedef struct join_context {
+  frame last;
+  bool nasal, nge, velar, pause, joined, again, repeated;
+} join_context;
+
 struct sj_chip {
   /* the input buffer: a FIFO of raw bytes, as the chip's is */
   uint8_t buf[SJ_BUFFER_SIZE];
@@ -234,6 +256,13 @@ struct sj_chip {
   float gain;
   bool fast, slow, stress, relax;
   bool joined;        /* the last sound ran straight into the next: no ramps at that join */
+  bool after_pause;    /* a pause code played since the last sound */
+  bool last_nge;       /* the last sound played was NGE */
+  bool after_velar;    /* the last sound played was GE */
+  bool last_nasal;    /* the last sound played was a nasal, MM NE NO NGE NGO (not the liquids that share K_NASAL) */
+  int ramp_seg;       /* a voiced stop after a nasal: its release ramp's segment (-1: none) */
+
+  join_context join_context;
 
   /* what is playing */
   segment seg[MAX_SEGMENTS];
@@ -254,6 +283,8 @@ struct sj_chip {
   float thk;          /* and its low-pass coefficient */
   float nhk;          /* an allophone's noise high pass coefficient */
   float fxburst, fxbk, fxblp; /* an effect's onset burst (fxs): level, low-pass coefficient and state */
+  float fxbms;        /* its length, ms (fxs tl; FXBURST_MS when 0) */
+  float fxhpk;        /* the effect's own noise high pass (fxs hp), one stage; 0: none */
   int copies;        /* copies of a Repeat still to play */
   int copy_of;       /* which allophone */
   frame last; /* where the voice is, for transitions into the next sound */
@@ -266,6 +297,9 @@ struct sj_chip {
   float xv; /* FX_SMOOTH: the voice's gain as it ramps in */
   float vbuzz; float bzbuf[1024]; int bzpos, bzclk; /* FX_BUZZ: the source's recent past, for the comb; ticks to the next click */
   int neq; float eqc[3][5], eqz[3][2]; /* the playing effect's peaking filters (fxeq): b0 b1 b2 a1 a2, and their state */
+  noise_filter cached_noise;
+  float cached_nf, cached_nw;
+  bool noise_cached;
   float nz[2]; /* the noise resonator's two delays */
   float nhp[4]; /* an allophone's noise high pass: input and output of each of its two stages */
   float venv; /* the voicing envelope this tick, for an FX_ALL effect's noise */
@@ -295,6 +329,10 @@ struct sj_chip {
   float coupling;       /* transfer from the first pole to the second */
   float zeroMix;
   bool speaking;
+  uint32_t retired_bytes, held_position, tick_position;
+  uint8_t held_code, tick_code;
+
+  struct sj_chip *join_scratch; /* allocated once, never on the audio stack */
 
   /* Keep these immutable tables last so a power-on reset preserves them. */
   noise_sweep sweeps[SWEEP_COUNT];
@@ -323,11 +361,12 @@ typedef struct allophone {
   uint8_t wf;         /* a white floor under its noise band, /256 of the band's level (0: none) */
   uint8_t rr;         /* its own release (fade-out) length, ms (0: the common one) */
   uint8_t tc;         /* its starting burst's low-pass corner, Hz/32 (0: THUMP_HZ) */
-  uint8_t th;         /* a low thump at its start: low noise under 800 Hz fading over 16 ms, /256 of the noise band's level (0: none) */
+  uint8_t th;         /* a low thump at its start: low noise under 800 Hz fading over 16 ms, /64 of the noise band's level (0: none) */
   uint8_t ba;         /* a voiced stop's bar fade-in from silence, ms (0: FRIC_RAMP) */
   int8_t bl;          /* the bar's level re the release, half-decibels (0: the same) */
   uint8_t aa;         /* its own attack (fade-in) length, ms (0: the class's) */
   uint8_t hp;         /* its noise high pass corner, Hz/16 (0: NHP_FC) */
+  uint8_t nd;         /* a decaying release: the noise band's level at the end of its last segment, /256 (0: steady) */
 } allophone;
 
 /* TABLES-BEGIN */
@@ -356,12 +395,14 @@ sj_chip *sj_new(void) {
   sj_chip *sj = (sj_chip *)calloc(1, sizeof(sj_chip));
   if (sj != NULL) {
     sj_power_on(sj);
+    sj->join_scratch = (sj_chip *)calloc(1, sizeof(sj_chip));
+    if (sj->join_scratch == NULL) { free(sj); return NULL; }
     prepare_noise_sweeps(sj);
   }
   return sj;
 }
 
-void sj_free(sj_chip *sj) { free(sj); }
+void sj_free(sj_chip *sj) { if (sj) free(sj->join_scratch); free(sj); }
 
 static void reset_controls(sj_chip *sj) {
   sj->volume = SJ_DEFAULT_VOLUME;
@@ -373,7 +414,7 @@ static void reset_controls(sj_chip *sj) {
 }
 
 void sj_power_on(sj_chip *sj) {
-  memset(sj, 0, offsetof(sj_chip, sweeps));
+  memset(sj, 0, offsetof(sj_chip, join_scratch));
   reset_controls(sj);
   sj->pending_code = -1;
   sj->rnd = 0x12345678u;
@@ -381,13 +422,13 @@ void sj_power_on(sj_chip *sj) {
   tune_from_env();
 #endif
   /* One output sample per chip tick. Precompute the entire filter step. */
-  const float w = 2.0 * M_PI * T.lpf_fc / RATE;
-  const float h = 0.5 / (T.lpf_q < 0.499 ? T.lpf_q : 0.499), r = sqrtf(h * h - 1.0);
+  const float w = 2.0f * SJ_PI * T.lpf_fc / RATE;
+  const float h = 0.5f / (T.lpf_q < 0.499f ? T.lpf_q : 0.499f), r = sqrtf(h * h - 1.0f);
   const float pole1 = w * (h - r), pole2 = w * (h + r);
   sj->decay1 = expf(-pole1);
   sj->decay2 = expf(-pole2);
   sj->coupling = pole2 / (pole2 - pole1) * (sj->decay1 - sj->decay2);
-  sj->zeroMix = pole2 / (2.0 * M_PI * LPF_ZERO / RATE);
+  sj->zeroMix = pole2 / (2.0f * SJ_PI * LPF_ZERO / RATE);
 }
 
 void sj_reset(sj_chip *sj) {
@@ -536,9 +577,22 @@ void sj_set_controls(sj_chip *sj, const sj_controls *c) {
  * Speed 114. linear: measured 95/197/287 ms for AW at Speed 127/90/60; the
  * effects change more: (147 - Speed) / 33 on every part (fitted on every effect
  * recording at a Speed other than 114; alone they read about (145 - Speed) / 31,
- * steeper still at low Speeds than near 114) */
+ * steeper still at low Speeds than near 114). Speech below Speed 114 follows
+ * the effects' law (VoxProbe 12, both units: AY and IYUW x1.21 at Speed 108,
+ * the effects' law x1.18, the old speech law x1.125; Man Goes Down P1 at
+ * Speed 108 E 8.28 -> 6.01, P 1.78 -> 0.94); above 114 the speech law stays
+ * (P2 at Speed 118 is worse on the effects' law) */
+/* ASSUMPTION (2026-11-08, VoxProbe 13 sections 3 and 9 and Man Goes Down P2 at Speed 118, both units): above Speed 114
+ * an unslowed vowel or glide (and its Repeat copy) and a pause shrink by (155.9 - Speed) / 47.4, a step down from 114
+ * (118: x0.80, 127: x0.61, as measured; the effects' law gives x0.88 at 118), and the other speech sounds don't shrink
+ * at all. P2 1700 ms against 1695/1700, timing inside it 12.9 -> 8.5 ms; with the step on the vowels alone the
+ * consonants ran 15-40 ms short each. Below 114 nothing changes */
+static float speed_step(const sj_chip *sj) { return (155.9f - sj->speed) / 47.4f; }
+
 static float speed_factor(const sj_chip *sj, bool effect) {
-  return effect ? (T.fx_speed_a - sj->speed) / T.fx_speed_b : (T.speed_a - sj->speed) / T.speed_b;
+  if (effect || sj->speed < 114)
+    return (T.fx_speed_a - sj->speed) / T.fx_speed_b;
+  return (T.speed_a - sj->speed) / T.speed_b;
 }
 
 /* Fast and Slow take away or add a share of the manual's length (measured
@@ -557,15 +611,17 @@ static float modified_ms(const sj_chip *sj, const allophone *a, float ms) {
     return ms * T.slow;
   if (sj->fast)
     ms *= T.fast;
+  /* SE SO SH take half of Slow's stretch (2026-11-08, VoxProbe 13 section 10, all four takes: every slowed SE 16-34 ms
+   * long at x4/3; VoxProbe 12 had Slow SE +20 ms; Man Goes Down P4's Slow SE Slow SE) */
   if (sj->slow)
-    ms *= T.slow;
+    ms *= (a - allophones >= 59 && a - allophones <= 61) ? 1.0f + (T.slow - 1.0f) / 2.0f : T.slow;
   return ms > 10 ? ms : 10;
 }
 
 /* Bend: every frequency moves by the same amount, 44 Hz a step (D1's 697
  * and 1209 Hz both step by 44). below 5 there is a 22 Hz jump */
 static float bend_hz(const sj_chip *sj) {
-  return T.bend_hz * (sj->bend - 5) + (sj->bend < 5 ? T.bend_hz / 2 : 0.0);
+  return T.bend_hz * (sj->bend - 5) + (sj->bend < 5 ? T.bend_hz / 2 : 0.0f);
 }
 
 #ifdef SJ_TALKO_RP2040
@@ -598,21 +654,21 @@ static float advance_phase(float phase, float step) {
 static float volume_gain(const sj_chip *sj) {
   /* measured on both units at Pitch 20 (VoxProbe 6): Volume 16 is 15 dB under
    * 32, and from 32 up the level barely moves */
-  static const float db[5] = {-15.5, -1.3, -1.1, 0.0, 2.2};
+  static const float db[5] = {-15.5f, -1.3f, -1.1f, 0.0f, 2.2f};
   static const float at[5] = {16, 32, 64, 96, 127};
   const float v = sj->volume;
   if (v <= 0)
-    return 0.0;
+    return 0.0f;
   float d;
   if (v < at[0])
-    d = db[0] - (at[0] - v) * 0.6;
+    d = db[0] - (at[0] - v) * 0.6f;
   else {
     int i = 0;
     while (i < 3 && v > at[i + 1])
       i++;
     d = db[i] + (db[i + 1] - db[i]) * (v - at[i]) / (at[i + 1] - at[i]);
   }
-  return expf(d / 20.0 * M_LN10);
+  return expf(d / 20.0f * SJ_LN10);
 }
 
 static float bent(float hz, float bend) { return hz > 0 ? (float)(hz + bend) : 0.0f; }
@@ -644,13 +700,15 @@ static void start(sj_chip *sj, bool effect) {
   if (!effect)
     sj->neq = 0; /* an allophone has no peaking filters */
   sj->attack = TICKS(effect ? T.fx_attack : T.attack);
-  sj->fxburst = 0.0;
+  sj->fxburst = 0.0f;
+  sj->fxbms = FXBURST_MS;
+  sj->fxhpk = 0.0f;
   sj->onset = 0;
   sj->onset_from = 0;
-  sj->release_gain = 1.0;
-  sj->wfloor = 0.0;
-  sj->thump = 0.0;
-  sj->thlp = 0.0;
+  sj->release_gain = 1.0f;
+  sj->wfloor = 0.0f;
+  sj->thump = 0.0f;
+  sj->thlp = 0.0f;
   sj->release = TICKS(effect ? T.fx_release : T.release);
   sj->cur = sj->tick = sj->stick = 0;
   sj->copies = 0;
@@ -706,7 +764,7 @@ static const uint8_t *fx_decode(const uint8_t *q, fxpart *f) {
 
 /* The AR(2) normalization holds noise power constant as its band moves. */
 static inline noise_filter noise_band(float nf, float nw, float level) {
-  const float r = expf(-M_PI * (nw > 10.0f ? nw : 10.0f) / RATE);
+  const float r = expf(-SJ_PI * (nw > 10.0f ? nw : 10.0f) / RATE);
   const float c = sj_sin2pi(nf / RATE + 0.25f);
   const float r2 = r * r, sum = 1.0f + r2;
   const float gain = sqrtf((1.0f - r2) * (sum * sum - 4.0f * r2 * c * c) / sum);
@@ -717,7 +775,7 @@ static inline noise_filter swept_band(float nf, float nw, int phase, int ticks) 
   const float p = (float)phase / ticks;
   const float sw = p < 0.4f ? p / 0.4f : 1.0f - (p - 0.4f) / 0.6f;
   nf *= expf((2.0f * sw - 1.0f) * 0.75f);
-  return noise_band(nf, nw, expf(-5.0f * sw / 20.0f * M_LN10));
+  return noise_band(nf, nw, expf(-5.0f * sw / 20.0f * SJ_LN10));
 }
 
 /* C8 and C9 have a repeating noise sweep with fixed center and bandwidth
@@ -738,21 +796,24 @@ static void prepare_noise_sweeps(sj_chip *sj) {
 }
 
 static void play_effect(sj_chip *sj, int code) {
+  sj->last_nasal = false;
+  sj->after_pause = false;
+  sj->after_velar = false;
   /* its peaking filters (fxeq, at most 3): a fixed shaping of its spectrum toward the chip's, set after its structure
    * was tuned (2026-11-04); RBJ peaking biquads at the chip's rate */
   sj->neq = 0;
   for (int i = 0; i < FXEQ_N && sj->neq < 3; i++) {
     if (fxeq[i][0] != code - 200)
       continue;
-    const float f = fxeq[i][1] * HZ_STEP, g = (int8_t)fxeq[i][2] / 2.0, qq = fxeq[i][3] / 10.0;
-    const float A = powf(10.0, g / 40.0), w = 2.0 * M_PI * f / RATE, al = sinf(w) / (2.0 * qq), cw = cosf(w), a0 = 1.0 + al / A;
+    const float f = fxeq[i][1] * HZ_STEP, g = (int8_t)fxeq[i][2] / 2.0f, qq = fxeq[i][3] / 10.0f;
+    const float A = powf(10.0f, g / 40.0f), w = 2.0f * SJ_PI * f / RATE, al = sinf(w) / (2.0f * qq), cw = cosf(w), a0 = 1.0f + al / A;
     float *c = sj->eqc[sj->neq];
-    c[0] = (1.0 + al * A) / a0;
-    c[1] = -2.0 * cw / a0;
-    c[2] = (1.0 - al * A) / a0;
-    c[3] = -2.0 * cw / a0;
-    c[4] = (1.0 - al / A) / a0;
-    sj->eqz[sj->neq][0] = sj->eqz[sj->neq][1] = 0.0;
+    c[0] = (1.0f + al * A) / a0;
+    c[1] = -2.0f * cw / a0;
+    c[2] = (1.0f - al * A) / a0;
+    c[3] = -2.0f * cw / a0;
+    c[4] = (1.0f - al / A) / a0;
+    sj->eqz[sj->neq][0] = sj->eqz[sj->neq][1] = 0.0f;
     sj->neq++;
   }
   const uint8_t *q = fxdata + fxat[code - 200], *const end = fxdata + fxat[code - 199];
@@ -782,7 +843,7 @@ static void play_effect(sj_chip *sj, int code) {
       a.a[0] = b.a[0] = a.a[1] = b.a[1] = 31;
       a.a[2] = b.a[2] = 0;
     }
-    a.lv = b.lv = (float)expf(p->lv * (0.5 * M_LN10 / 20.0));
+    a.lv = b.lv = (float)expf(p->lv * (0.5f * SJ_LN10 / 20.0f));
     a.nf = b.nf = (float)(p->nf * HZ_STEP);
     a.nw = b.nw = (float)(p->nw * HZ_STEP);
     a.na = b.na = p->nv;
@@ -809,9 +870,14 @@ static void play_effect(sj_chip *sj, int code) {
     sj->attack = TICKS(x[0]);
   if (x[1])
     sj->release = TICKS(x[1]);
-  sj->fxburst = x[2] / 256.0;
-  sj->fxbk = 1.0 - expf(-2.0 * M_PI * (x[3] ? x[3] * 32.0 : THUMP_HZ) / 8000.0);
-  sj->fxblp = 0.0;
+  sj->fxburst = x[2] / 64.0f; /* /64 since 2026-11-07 (was /256; values divided by four): 253 M1's 50 ms burst needs the range */
+  sj->fxbk = 1.0f - expf(-2.0f * SJ_PI * (x[3] ? x[3] * 32.0f : THUMP_HZ) / 8000.0f);
+  sj->fxblp = 0.0f;
+  /* 253 M1 (2026-11-07, both units, every take): a low block 100-500 Hz for the first ~50 ms under a hiss that has little
+   * under 500 Hz. An effect's noise is otherwise white to DC: its own high pass (hp, Hz/16, one stage) and its burst's own
+   * length (tl, ms) */
+  sj->fxhpk = x[4] ? 1.0f / (1.0f + 2.0f * SJ_PI * (x[4] * 16.0f) / 8000.0f) : 0.0f;
+  sj->fxbms = x[5] ? (float)x[5] : FXBURST_MS;
 }
 
 static frame allo_frame(const allophone *a, bool second, float bend) {
@@ -833,7 +899,7 @@ static frame allo_frame(const allophone *a, bool second, float bend) {
   f.a[0] = a->a1;
   f.a[1] = a->a2;
   f.a[2] = a->a3;
-  f.lv = (float)expf(a->lv * (0.5 * M_LN10 / 20.0));
+  f.lv = (float)expf(a->lv * (0.5f * SJ_LN10 / 20.0f));
   f.nf = (float)(a->nf * HZ_STEP);
   f.nw = (float)(a->nw * HZ_STEP);
   f.na = a->na;
@@ -846,6 +912,8 @@ static frame allo_frame(const allophone *a, bool second, float bend) {
  * away through it (both units: a vowel before a stop falls 30 dB over 50 to
  * 60 ms at Speed 114, twice that at Speed 60), not a cut to silence; a voiced
  * stop hums through it on its first formant */
+static int next_sound(const sj_chip *sj, int i);
+static bool slow_before_next(const sj_chip *sj, int i);
 static int add_stop(sj_chip *sj, const allophone *a, frame from, int ticks, float bend) {
   const frame tgt = allo_frame(a, false, bend);
   frame bar = from, gone = silent_frame();
@@ -853,7 +921,7 @@ static int add_stop(sj_chip *sj, const allophone *a, frame from, int ticks, floa
     gone.f[0] = tgt.f[0];
     gone.a[0] = tgt.a[0]; /* the first formant's level: both units' voiced stops open on a voice bar 2-9 dB under the release (BE, BO, DE, DO, GE, GO) */
     gone.lv = tgt.lv;     /* at the sound's own level (VoxProbe 6, slowed: DE's bar 3-4 dB under its release, BE's 8) */
-    gone.lv = (float)(tgt.lv * powf(10.0, a->bl / 40.0)); /* or its own (the structure loop's bl) */
+    gone.lv = (float)(tgt.lv * powf(10.0f, a->bl / 40.0f)); /* or its own (the structure loop's bl) */
     /* and its upper formants, weak (both units, the bar alone: 6-10 dB more than F1's tail at 1.8-5 kHz, 12-24 on GE GO) */
     gone.f[1] = tgt.f[1];
     gone.f[2] = tgt.f[2];
@@ -864,8 +932,60 @@ static int add_stop(sj_chip *sj, const allophone *a, frame from, int ticks, floa
    * the release: BE BO DE DO GE GO's bar 2-11 dB under the peak through the closure, not a fade up from nothing) */
   if (a->kind == K_VSTOP && bar.a[0] + bar.a[1] + bar.a[2] + bar.na == 0.0f)
     bar = gone;
-  /* each stop's own closure (both units, lined up on the release: BE BO DE DO's bar 50-55 ms, the final stops' 5-16) */
-  const int closure = TICKS((a->cl ? a->cl : T.closure) * speed_factor(sj, false));
+  /* each stop's own closure (both units, lined up on the release: BE BO DE DO's bar 50-55 ms, the final stops' 5-16);
+   * those were measured from silence, where the closure is the voice bar. After a sound the chip closes for at least
+   * JOIN_CLOSURE (2026-11-06, Man Goes Down's NE GO, both units: 30-40 ms at -27 to -37 dB before the burst; ours, with
+   * GO's 8 ms, ran straight on and "goes" lost its /g/; P on every recording with a stop after a sound: MGD P1 1.946 ->
+   * 1.625, EH DE 0.694 -> 0.194, AW TT 1.058 -> 1.023, MGD P2 0.615 -> 0.656, every other unchanged) */
+  float clms = a->cl ? a->cl : T.closure;
+  /* ASSUMPTION (2026-11-07, VoxProbe 12 DO AYWW, both units: 284 ms where DO's 44 ms closure gave 315; DO alone needs
+   * the 44): a voiced stop from silence, not slowed, running into a sound with no Slow on it closes for at most 30 ms.
+   * "man goes down"'s DO (Slow on its AYWW) keeps its closure, as the recordings want. Not after a pause code
+   * (2026-11-08, Man Goes Down P2's TT P1 BE: BE 45 ms early, P2 timing 14.1 -> 12.7 ms) */
+  if (a->kind == K_VSTOP && from.a[0] + from.a[1] + from.a[2] + from.na == 0.0f && next_sound(sj, sj->executing) >= 128 && !slow_before_next(sj, sj->executing) && !sj->slow && !sj->after_pause && clms > 30.0f)
+    clms = 30.0f;
+  if (from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f && clms < JOIN_CLOSURE)
+    clms = JOIN_CLOSURE;
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 6, all four takes): after a sound DE DO close 25 ms longer and GE GO
+   * 15 ms (AW EH LO MM NE NO NGE OW RR before DO were 15-59 ms short, before GO 4-58, before BO 0-11) */
+  const long stop_id = a - allophones;
+  const bool alveolar = stop_id == 46 || stop_id == 47, velar = stop_id == 50 || stop_id == 51;
+  if (a->kind == K_VSTOP && from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f)
+    clms += alveolar ? 25.0f : velar ? 15.0f : 0.0f;
+  /* a voiced stop after a nasal closes quietly, and Slow lengthens that closure (Man Goes Down's NE GO, VoxProbe 12
+   * section 4, all four takes: the join falls to -38..-41 dB above 300 Hz, under -30 dB for 30-40 ms as sent and 20-30
+   * without its Slow; ours stayed above -22 dB and "goes" lost its /g/. EH DE, a vowel into a voiced stop, has no such
+   * gap on either unit. P1: E 6.01 -> 5.02, P 0.94 -> 0.53; P2 and EH DE unchanged) */
+  /* ASSUMPTION (2026-11-08): an unvoiced stop straight after a pause code closes 30 ms longer, in silence, so it can't
+   * be seen on a stop played alone (VoxProbe 13 UX P1 EK 22 ms short; Man Goes Down P4's UX P1 EK: P4 timing 9.7 -> 4.9
+   * ms, length 910 -> 940 against 942/945) */
+  if (a->kind == K_STOP && sj->after_pause)
+    clms += 30.0f;
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 NE KO OW, both units by picture: NE stops at 0.105 s and KO bursts at 0.15, 30 ms
+   * after ours; NE TT and NE PO already land): KE and KO after a nasal close 30 ms longer */
+  if ((a - allophones == 66 || a - allophones == 67) && sj->last_nasal && from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f)
+    clms += 30.0f;
+  /* ASSUMPTION (2026-11-08): a slowed unvoiced stop after a sound closes 20 ms longer (VoxProbe 13 section 10, all four
+   * takes: AW Slow TT AW and Slow AYWW Slow TT 60 ms short; Man Goes Down P2's UW Slow TT: P2 timing 17.0 -> 12.3) */
+  if (a->kind == K_STOP && sj->slow && from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f && next_sound(sj, sj->executing) < 128)
+    clms += 20.0f; /* only before a pause (2026-11-08): before a sound the vowel ahead runs on instead (see the join) */
+  const bool nasal_join = a->kind == K_VSTOP && sj->last_nasal && from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f;
+  /* the gap's width, band by band on both units' Man Goes Down NE GO (2026-11-07): 20-32 ms under the row's peak
+   * -45 dB at 700-3000 Hz, closing at 473-485 ms; 45 ms read 28-38 and closed 480-488 */
+  if (nasal_join)
+    clms = NASAL_CLOSURE;
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 6; Man Goes Down P1 1488 -> 1502 against 1495/1502): after a nasal
+   * DE DO GE GO close 10 ms longer than BE BO; not under Slow (Man Goes Down P1's Slow GO: timing 18.3 -> 12.3 ms
+   * without it) */
+  if (nasal_join && (alveolar || velar) && !sj->slow)
+    clms += 10.0f;
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 6, all four takes: NGE before BO DO GO 38-48 ms short): after NGE the
+   * closure is 40 ms longer */
+  if (nasal_join && sj->last_nge)
+    clms += 40.0f;
+  if (nasal_join && sj->slow)
+    clms *= T.slow;
+  const int closure = TICKS(clms * speed_factor(sj, false));
   /* from silence, the bar opens on a click: the release's full frame falling into the bar over BAR_CLICK ms (both units,
    * every voiced stop's first 10 ms 11-33 dB over the library's at 1-10 kHz) */
   int click = 0;
@@ -875,10 +995,41 @@ static int add_stop(sj_chip *sj, const allophone *a, frame from, int ticks, floa
       click = closure - 1;
     add_segment(sj, click, tgt, gone, true);
   }
-  add_segment(sj, closure - click, bar, gone, a->kind == K_VSTOP || bar.a[0] + bar.a[1] + bar.a[2] > 0.0f);
+  if (nasal_join) {
+    frame quiet = gone;
+    quiet.lv = (float)(gone.lv * NASAL_BAR);
+    /* and the whole band dips evenly (both units: 300-700 Hz 22-25 ms under its peak -30 dB, where the bar's F1
+     * hummed through; 1300-1700 at -38..-47 dB, where eight-fold F2 drew a line through the gap) */
+    quiet.a[0] *= 0.300f;
+    quiet.a[1] *= 2.500f;
+    quiet.a[2] *= 2.500f;
+    /* the nasal's F2 and F3 fall into the closure rather than rising to the stop's (both units, NE GO: F2 1640 -> 1510,
+     * F3 2615 -> 2140 Hz; ours rose to GO's 1900 and 3200) */
+    quiet.f[1] = bar.f[1] * 0.92f;
+    quiet.f[2] = bar.f[2] * 0.82f;
+    const int fade = (int)(closure * NASAL_FADE);
+    add_segment(sj, fade, bar, quiet, true);
+    add_segment(sj, closure - fade, quiet, quiet, true);
+  } else if (a->kind == K_STOP && bar.a[0] + bar.a[1] + bar.a[2] + bar.na > 0.0f && closure > TICKS(10.0f) + 1) {
+    /* an unvoiced stop's closure is silent after a 10 ms fade (2026-11-08, VoxProbe 13, both units: every vowel, nasal
+     * or hiss before TT KO PO stops and leaves a 20-40 ms gap before the burst; ours faded across the whole closure and
+     * never went quiet, so the runs of sound didn't match the chips' on 11 items) */
+    add_segment(sj, TICKS(10.0f), bar, gone, bar.a[0] + bar.a[1] + bar.a[2] > 0.0f);
+    add_segment(sj, closure - TICKS(10.0f), gone, gone, false);
+  } else
+    add_segment(sj, closure - click, bar, gone, a->kind == K_VSTOP || bar.a[0] + bar.a[1] + bar.a[2] > 0.0f);
   /* the release glides to the stop's second frame: the first formant falls into a labial or alveolar closure
    * (both units: EB, OB, ED, OD); a stop without a measured target holds */
-  add_segment(sj, ticks, tgt, allo_frame(a, true, bend), a->kind == K_VSTOP);
+  /* after a nasal the release comes in over NASAL_RAMP from 10 dB down (both units: 5-15 dB under ours in its first
+   * 10 ms, full by ~15 ms; ours started at full level with a 5 ms onset boost on top) */
+  if (nasal_join && ticks > TICKS(NASAL_RAMP) + 1) {
+    frame low = tgt;
+    low.lv = (float)(tgt.lv * NASAL_RAMP_FROM);
+    sj->ramp_seg = sj->nseg;
+    add_segment(sj, TICKS(NASAL_RAMP), low, tgt, true);
+    add_segment(sj, ticks - TICKS(NASAL_RAMP), tgt, allo_frame(a, true, bend), true);
+  } else
+    add_segment(sj, ticks, tgt, allo_frame(a, true, bend), a->kind == K_VSTOP);
   return closure + ticks;
 }
 
@@ -891,7 +1042,7 @@ static int copy_segments(sj_chip *sj, const allophone *a) {
   const float bend = bend_hz(sj);
   const frame tgt = allo_frame(a, false, bend);
   sj->nseg = 0;
-  const int ticks = TICKS((a->cp * MS_STEP + T.copy_extra) * speed_factor(sj, false));
+  const int ticks = TICKS((a->cp * MS_STEP + T.copy_extra) * ((a->kind == K_VOWEL || a->kind == K_GLIDE) && sj->speed > 114 && !sj->slow ? speed_step(sj) : speed_factor(sj, false)));
   if (a->kind == K_STOP || a->kind == K_VSTOP) {
     /* the copy opens on a closure, then the release; cp is the whole copy, measured from one copy's onset to the next.
      * the closure is silent (VoxProbe 4 and 7, both units: GE, GO and the final stops dip 27-35 dB between copies,
@@ -927,25 +1078,89 @@ static int copy_segments(sj_chip *sj, const allophone *a) {
  * silence, the sound's own frame at no level (the formants don't sweep up
  * from 0 Hz at the start of a phrase or after a pause) */
 static frame from_frame(const sj_chip *sj, frame tgt) {
-  if (sj->last.a[0] > 0 || sj->last.a[1] > 0 || sj->last.a[2] > 0 || sj->last.na > 0)
+  /* after a hiss (noise only) a sound starts as from silence: its formants and noise band don't sweep from the hiss's
+   * (2026-11-08, VoxProbe 13 SE TT AW and AW Slow SE Slow SE UX, both units: the hiss stops and the next sound starts
+   * on its own frame; ours swept a dark line from ~6 kHz down into TT's closure and UX's onset) */
+  if (sj->last.a[0] > 0 || sj->last.a[1] > 0 || sj->last.a[2] > 0)
     return sj->last;
   tgt.a[0] = tgt.a[1] = tgt.a[2] = 0.0f;
   tgt.na = 0.0f;
   return tgt;
 }
 
+static frame lerp_frame(frame a, frame b, float t) {
+  for (int q = 0; q < 3; q++) {
+    a.f[q] += (b.f[q] - a.f[q]) * t;
+    a.a[q] += (b.a[q] - a.a[q]) * t;
+  }
+  a.lv += (b.lv - a.lv) * t;
+  a.nf += (b.nf - a.nf) * t;
+  a.nw += (b.nw - a.nw) * t;
+  a.na += (b.na - a.na) * t;
+  return a;
+}
+
+/* the sound's last at ticks bend F2 and F3 to (f2, f3), its levels and F1 as they are (split where the span starts) */
+static void anticipate(sj_chip *sj, int at, float f2, float f3) {
+  int total = 0;
+  for (int k = 0; k < sj->nseg; k++)
+    total += sj->seg[k].ticks;
+  if (at <= 0 || at >= total - 1 || sj->nseg >= MAX_SEGMENTS)
+    return;
+  const int start = total - at;
+  int acc = 0, k = 0;
+  while (acc + sj->seg[k].ticks <= start)
+    acc += sj->seg[k++].ticks;
+  if (acc < start) {
+    const segment sg = sj->seg[k];
+    const int t1 = start - acc;
+    const frame mid = lerp_frame(sg.from, sg.to, (float)t1 / (float)sg.ticks);
+    memmove(&sj->seg[k + 2], &sj->seg[k + 1], (size_t)(sj->nseg - k - 1) * sizeof(segment));
+    sj->seg[k].ticks = t1;
+    sj->seg[k].to = mid;
+    sj->seg[k + 1] = sg;
+    sj->seg[k + 1].ticks = sg.ticks - t1;
+    sj->seg[k + 1].from = mid;
+    sj->nseg++;
+    k++;
+  }
+  const float f2a = sj->seg[k].from.f[1], f3a = sj->seg[k].from.f[2];
+  int el = 0;
+  for (; k < sj->nseg; k++) {
+    segment *g = &sj->seg[k];
+    g->from.f[1] = f2a + (f2 - f2a) * (float)el / (float)at;
+    g->from.f[2] = f3a + (f3 - f3a) * (float)el / (float)at;
+    el += g->ticks;
+    g->to.f[1] = f2a + (f2 - f2a) * (float)el / (float)at;
+    g->to.f[2] = f3a + (f3 - f3a) * (float)el / (float)at;
+  }
+}
+
 /* expand an allophone into segments: its first play */
 static void play_allophone(sj_chip *sj, const allophone *a) {
   const float bend = bend_hz(sj);
-  const int ticks = TICKS(modified_ms(sj, a, a->ms * MS_STEP) * speed_factor(sj, false));
+  /* vowels and glides take the effects' Speed law above 114 too (2026-11-08, VoxProbe 13 section 3, all four takes:
+   * AW AY EYIY IYUW OWWW UX alone at Speed 118, 122, 127 10-30 ms long on the speech law, within a few ms on this one;
+   * Man Goes Down P2 at Speed 118 1698 ms against 1695/1700 with the liquid joins below) */
+  int ticks = TICKS(modified_ms(sj, a, a->ms * MS_STEP) * ((a->kind == K_VOWEL || a->kind == K_GLIDE) ? (sj->speed > 114 && !sj->slow ? speed_step(sj) : speed_factor(sj, true)) : (sj->speed > 114 ? 1.0f : speed_factor(sj, false))));
   const frame tgt = allo_frame(a, false, bend), tgt0 = tgt;
   const frame from = from_frame(sj, tgt);
   sj->nseg = 0;
+  sj->ramp_seg = -1;
   switch (a->kind) {
   case K_VOWEL:
   case K_NASAL:
   case K_VFRIC: {
     int tr = TICKS(T.transition);
+    /* ASSUMPTION (2026-11-08, VoxProbe 13 section 7, all four takes: after GE's burst F2 glides from ~2000 Hz to the
+     * vowel's over ~60 ms before OW; GE OW, GE UW 39-49 ms short, GE IY EH AY 15-20): a vowel after GE moves from GE's
+     * frame over 8 ms more per ERB of F2 distance (10 put GE OW's end 10 ms late on the picture), and is that much longer */
+    if (sj->after_velar && a->kind == K_VOWEL) {
+      const float ea = 21.4f * logf(1.0f + 0.00437f * from.f[1]) / SJ_LN10, eb = 21.4f * logf(1.0f + 0.00437f * tgt.f[1]) / SJ_LN10;
+      const int ex = TICKS(8.0f * (ea > eb ? ea - eb : eb - ea) * speed_factor(sj, true));
+      tr += ex;
+      ticks += ex;
+    }
     if (tr > ticks)
       tr = ticks;
     /* a sound with an onset, from silence, starts on its own frame (its onset at full level) */
@@ -996,6 +1211,11 @@ static void play_allophone(sj_chip *sj, const allophone *a) {
     break;
   }
   case K_FRIC:
+    /* ASSUMPTION (2026-11-08, VoxProbe 13 section 10, all four takes: TH between a vowel and a sound ~75 ms on the chip,
+     * ~40 here; AW TH AW, IHWW TH RR 25-39 ms short): TH after a voiced sound and before another plays 25 ms longer.
+     * Not before a pause (Man Goes Down P2's Slow TH P4: timing 12.7 -> 16.0 ms with it) */
+    if (a - allophones == 62 && from.a[0] + from.a[1] + from.a[2] + from.na > 0.0f && next_sound(sj, sj->executing) >= 128)
+      ticks += TICKS(25.0f * speed_factor(sj, false));
     add_segment(sj, ticks, tgt, tgt, false);
     break;
   case K_STOP:
@@ -1010,6 +1230,11 @@ static void play_allophone(sj_chip *sj, const allophone *a) {
   }
   }
   start(sj, false);
+  sj->last_nasal = a - allophones >= 12 && a - allophones <= 16;
+  sj->last_nge = a - allophones == 15;
+  sj->after_velar = a - allophones == 50;
+  sj->after_pause = false;
+  const bool nasal_ramp = sj->ramp_seg >= 0;
   /* an unvoiced fricative starts and stops at once (HE HO WH FF SE SO SH TH, both units, background allowed for: rise
    * and fall 0-4 ms, median 2, where the vowels' 35 ms ramp gave 22-38) */
   if (a->kind == K_FRIC)
@@ -1020,7 +1245,9 @@ static void play_allophone(sj_chip *sj, const allophone *a) {
     sj->attack = TICKS(NASAL_ATTACK); /* a nasal rises faster than a vowel (both units, lined up at -20 dB: full in 15 ms, not 25) */
   /* a louder onset (VoxRecord solo, both units: the voiced stops' and fricatives' first 1-8 ms, 3-19 dB over the rest) */
   sj->onset = TICKS(a->ob);
-  sj->onset_gain = powf(10.0, a->og / 40.0);
+  sj->onset_gain = powf(10.0f, a->og / 40.0f);
+  if (nasal_ramp)
+    sj->onset = 0; /* its ramp replaces the onset boost */
   if (sj->onset > 0)
     sj->attack = 0; /* a sound with an onset starts at once, the onset at full level */
   if (a->kind == K_VSTOP && a->ba && from.a[0] + from.a[1] + from.a[2] + from.na == 0.0f)
@@ -1033,14 +1260,21 @@ static void play_allophone(sj_chip *sj, const allophone *a) {
   /* a stop's release level of its own (both units, lined up on the release: DE's and DO's voicing after the first pulse
    * 7-11 dB under the library's, their bars and bursts as the library's) */
   if (a->rl && sj->onset_from > 0)
-    sj->release_gain = powf(10.0, a->rl / 40.0);
+    sj->release_gain = powf(10.0f, a->rl / 40.0f);
   /* a white floor under the band (WH, both units: noise 30 dB under its 700 Hz band out to 12 kHz) */
-  sj->wfloor = a->wf / 256.0;
-  sj->nhk = 1.0 / (1.0 + 2.0 * M_PI * (a->hp ? a->hp * 16.0 : NHP_FC) / 8000.0); /* its own corner (PE, PO: their noise's bottom end) */
+  sj->wfloor = a->wf / 256.0f;
+  sj->nhk = 1.0f / (1.0f + 2.0f * SJ_PI * (a->hp ? a->hp * 16.0f : NHP_FC) / 8000.0f); /* its own corner (PE, PO: their noise's bottom end) */
   /* a sibilant starts on a burst of low noise (both units, every take: SE SO SH 12-18 dB over their body's 100-700 Hz
    * band at the onset, a column under 1 kHz about 15 ms long) */
-  sj->thump = a->th / 256.0;
-  sj->thk = 1.0 - expf(-2.0 * M_PI * (a->tc ? a->tc * 32.0 : THUMP_HZ) / 8000.0);
+  /* no starting burst straight after a hiss (2026-11-08, VoxProbe 13 AW SE SE and AW Slow SE Slow SE UX, both units: the
+   * second SE has no low column; ours had a dark blob under 1 kHz there, Man Goes Down P4's too) */
+  sj->thump = (sj->last.na > 0.0f && sj->last.a[0] + sj->last.a[1] + sj->last.a[2] == 0.0f) ? 0.0f : a->th / 64.0f; /* /64 since 2026-11-07 (was /256): SE's thump was pinned at the byte's top and the chip's is
+                             * twice as loud (every figure better at x2); the stored values were divided by four */
+  sj->thk = 1.0f - expf(-2.0f * SJ_PI * (a->tc ? a->tc * 32.0f : THUMP_HZ) / 8000.0f);
+  /* a release that decays: the noise band ends its last segment at nd/256 of its level (TS, both units, every take:
+   * -13 dB over its 95 ms, the low band holding - the white floor - while the band falls) */
+  if (a->nd && sj->nseg > 0)
+    sj->seg[sj->nseg - 1].to.na *= a->nd / 256.0f;
   if (a->rr)
     sj->release = TICKS(a->rr); /* a sound's own fade-out (SE, SO: the chip fades over most of the sound) */
   /* the copies of a Repeat follow on; the level ramps once, over the whole */
@@ -1060,6 +1294,7 @@ static void play_pause(sj_chip *sj, float ms) {
   sj->nseg = 0;
   add_segment(sj, TICKS(ms), silent_frame(), silent_frame(), false);
   start(sj, false);
+  sj->after_pause = true;
 }
 
 static int peek(const sj_chip *sj, int i) { return sj->buf[(sj->head + i) % SJ_BUFFER_SIZE]; }
@@ -1084,35 +1319,259 @@ static int next_sound(const sj_chip *sj, int i) {
   return -1;
 }
 
-/* Blend adjacent sounds while the first one's release is still unrendered. */
-static void join_next_sound(sj_chip *sj, int code, int offset) {
-  const int next = next_sound(sj, offset);
-  if (next < 0 || sj->nseg == 0 ||
-      (sj->stick > 0 && sj->stotal - sj->stick < sj->release))
-    return;
+/* a Slow among the modifiers between offset i and the next sound */
+static bool slow_before_next(const sj_chip *sj, int i) {
+  while (i < sj->count) {
+    const int c = peek(sj, i);
+    if (c >= 128)
+      return false;
+    if (c == 8)
+      return true;
+    if (c == 7 || c == 14 || c == 15 || c == 16)
+      i += 1;
+    else if (c == 20 || c == 21 || c == 22 || c == 23 || c == 26)
+      i += 2;
+    else
+      return false;
+  }
+  return false;
+}
 
-  const int last = sj->nseg - 1;
-  segment *tail = &sj->seg[last];
-  const bool both = tail->voiced && next <= 199 &&
-                    allophones[next - 128].kind != K_FRIC && allophones[next - 128].kind != K_STOP;
-  /* Repeated sounds play as copies. Other sounds can cover part of this one's tail. */
-  const int cut = next == code ? 0 : TICKS(both ? T.overlap_v : T.overlap);
-  if (cut > 0 && tail->ticks > cut + 1 &&
-      (sj->cur != last || (tail->ticks - cut > sj->tick &&
-                           (sj->tick == 0 || memcmp(&tail->from, &tail->to, sizeof(frame)) == 0)))) {
-    tail->ticks -= cut;
+/* the sound's last span ticks taken off, across its segments */
+static void trim_tail(sj_chip *sj, int span) {
+  while (span > 0 && sj->nseg > 1) {
+    segment *g = &sj->seg[sj->nseg - 1];
+    if (g->ticks > span + 1) {
+      g->ticks -= span;
+      sj->stotal -= span;
+      return;
+    }
+    span -= g->ticks;
+    sj->stotal -= g->ticks;
+    sj->nseg--;
+  }
+}
+
+static bool slow_before_next(const sj_chip *sj, int i);
+/* The same upstream 0.4.3 rules serve stored phrases and live Queue input. */
+static void join_next_sound(sj_chip *sj, int code, int n,
+                            bool prev_nasal, bool prev_kind_vowel) {
+/* followed at once by another sound: the next one's start covers this
+ * one's end, by more when both are voiced (measured on the pairs:
+ * vowel to vowel 51 ms, with a hiss or a stop on either side 10 to 24) */
+const int next = next_sound(sj, n);
+/* ASSUMPTION (2026-11-07, Man Goes Down P4 only, both units: its Slow IYUW ends ~40-50 ms after ours; the same
+ * Slow IYUW alone matches, VoxProbe 12): a slowed glide followed by modifiers that include a Slow, before the next
+ * sound, plays SLOW_GLIDE_ON ms longer. P4 944 ms on the chip, 875 -> 925 here; the cause is unknown. 2026-11-08,
+ * VoxProbe 13 Slow IYUW Slow SE, both units, by picture: IYUW ends ~20 ms after ours without the rule and the SE
+ * after it is right; with Slow IYUW SE (no Slow after) it already matches. 25 ms (P4 940 against 942/945) */
+if (allophones[code - 128].kind == K_GLIDE && sj->slow && next >= 128 && slow_before_next(sj, n) && sj->nseg > 0) {
+  sj->seg[sj->nseg - 1].ticks += TICKS(SLOW_GLIDE_ON * speed_factor(sj, false));
+  sj->stotal += TICKS(SLOW_GLIDE_ON * speed_factor(sj, false));
+}
+/* a voiced sound straight into SE bends F2 and F3 to ZZ's, SE's voiced partner, over its last 40 ms (Man Goes
+ * Down P4, both units: IYUW's F2 falls to ~1090 Hz and rises to ~1500 before the hiss; ZZ's F2 is 1469) */
+if (next == 187 && sj->nseg > 0 && sj->seg[sj->nseg - 1].voiced) {
+  const allophone *zz = &allophones[167 - 128];
+  anticipate(sj, TICKS(40.0f * speed_factor(sj, false)), bent(zz->f2 * HZ_STEP, bend_hz(sj)), bent(zz->f3 * HZ_STEP, bend_hz(sj)));
+}
+/* GO followed at once by a sound starting on OW (OW OWRR OWIY OWWW) releases on F2 1430 and F3 1920 Hz, F3 the
+ * stronger by 4-5 dB (Man Goes Down's GO OWWW, both units, the user's drawn lines: two level bands that then split
+ * into OW's F2 and F3); alone it keeps its table formants, which its solo takes need (moving them there: spectrum
+ * 2.28 -> 4.12). Only before OW until another context is recorded (VoxProbe 13 section 7) */
+if (code == 179 && (next == 137 || next == 153 || next == 156 || next == 164) && sj->nseg > 0) {
+  segment *r = &sj->seg[sj->nseg - 1];
+  const float bh = bend_hz(sj);
+  r->from.f[1] = r->to.f[1] = bent(1430.0f, bh);
+  r->from.f[2] = r->to.f[2] = bent(1920.0f, bh);
+  r->from.a[1] = r->to.a[1] = r->to.a[1] * 0.5f;
+  r->from.a[2] = r->to.a[2] * 6.0f;
+  r->to.a[2] = r->from.a[2];
+  if (sj->ramp_seg >= 0 && sj->ramp_seg < sj->nseg - 1) {
+    segment *q = &sj->seg[sj->ramp_seg];
+    q->from.f[1] = q->to.f[1] = r->from.f[1];
+    q->from.f[2] = q->to.f[2] = r->from.f[2];
+    q->from.a[1] = q->to.a[1] = r->from.a[1];
+    q->from.a[2] = q->to.a[2] = r->from.a[2];
+  }
+}
+if (next >= 0 && sj->nseg > 0) {
+  segment *l = &sj->seg[sj->nseg - 1];
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 AW Slow TT AW, both units by picture: aspiration ~50 ms where ours had ~25,
+   * the AW after it 30-40 ms later than ours; Slow TT alone doesn't change, NE Slow TT IHWW is already long): a
+   * slowed unvoiced stop after a sound other than a nasal, followed at once by a voiced sound, releases 40 ms
+   * longer */
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 6, both units, the runs of sound): an unslowed NE or NO straight
+   * into GO or GE runs on 18 ms, and 25 more when the GO is slowed (the Slow read ahead); not with a Fast on the GO.
+   * NE GO OW's NE 90 -> 110 against 110-120, NO GO 100 -> 115 against 112, NE Slow GO 90 -> 135 against 130, NE Fast
+   * GO 90 against 90. Man Goes Down P1's NE is slowed and keeps its length (fitted to the drawn lines) */
+  if ((code == 141 || code == 142) && (next == 178 || next == 179) && !sj->slow) {
+    bool fast_next = false;
+    for (int i = n; i < sj->count && peek(sj, i) < 128; i += (peek(sj, i) >= 20 && peek(sj, i) <= 26) ? 2 : 1)
+      if (peek(sj, i) == 7)
+        fast_next = true;
+    if (!fast_next) {
+      const float ex = 18.0f + (slow_before_next(sj, n) ? 25.0f : 0.0f);
+      l->ticks += TICKS(ex);
+      sj->stotal += TICKS(ex);
+    }
+  }
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 AW Slow TT AW and Slow AYWW Slow TT, both units, the runs of sound: the
+   * sound before a slowed unvoiced stop runs on ~40 ms - the Slow is read ahead - unless it is a nasal or the stop
+   * is followed by a pause (Man Goes Down P2's UW Slow TT P1): AW 130 -> 170 ms against 170) */
+  if (next <= 199 && allophones[next - 128].kind == K_STOP && slow_before_next(sj, n) && allophones[code - 128].kind != K_STOP && !(code >= 140 && code <= 144)) {
+    int j = n;
+    while (j < sj->count && peek(sj, j) < 128)
+      j += (peek(sj, j) >= 20 && peek(sj, j) <= 26) ? 2 : 1;
+    if (!(j + 1 < sj->count && peek(sj, j + 1) <= 6)) {
+      l->ticks += TICKS(40.0f);
+      sj->stotal += TICKS(40.0f);
+    }
+  }
+  if (allophones[code - 128].kind == K_STOP && sj->slow && !prev_nasal && next <= 199 && allophones[next - 128].kind != K_STOP && allophones[next - 128].kind != K_FRIC) {
+    l->ticks += TICKS(15.0f); /* 15, not 40, now the vowel ahead runs on: the release after it 185 ms against 185 */
+    sj->stotal += TICKS(15.0f);
+  }
+  /* a stop on either side takes the short overlap (the comment's own "a stop on either side"; the code only looked
+   * at the next sound, so GO lost 51 ms of its release to OWWW and turned 15-25 ms early) */
+  const int kc = allophones[code - 128].kind;
+  const bool both = l->voiced && kc != K_STOP && kc != K_VSTOP && next <= 199 && allophones[next - 128].kind != K_FRIC && allophones[next - 128].kind != K_STOP;
+  /* no overlap before the same sound again: it plays as a copy, which runs on from this one as a Repeat's do */
+  /* no overlap after an unvoiced stop: its burst and aspiration play whole (the TT AW pairs, VoxProbe 4, 8, 9, both
+   * units: 166-176 ms where ours read 145; 160 with the whole release) */
+  int cut = (next == code || kc == K_STOP) ? 0 : TICKS(both ? T.overlap_v : T.overlap);
+  /* ASSUMPTIONS (2026-11-08, VoxProbe 13, both units, the runs of sound against the silent closure): no overlap from a
+   * vowel, glide or hiss into TT (AW 130 -> 145 against 152, SE 80 -> 95 against 102), nor from NE or NO into KE KO
+   * PE PO BE BO (NE 90 -> 105 against 105-110); PO into a voiced sound after a vowel overlaps 20 ms (AW PO AW's
+   * release 195 -> 175 against 175) */
+  if (next == 191 && !(code >= 140 && code <= 144) && !slow_before_next(sj, n))
+    cut = 0;
+  if ((code == 141 || code == 142) && (next == 194 || next == 195 || next == 198 || next == 199 || next == 170 || next == 171))
+    cut = 0;
+  if (code == 199 && prev_kind_vowel && next <= 199 && allophones[next - 128].kind != K_STOP && allophones[next - 128].kind != K_FRIC)
+    cut = TICKS(20.0f);
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 10, all four takes: AW TH AW, IHWW TH RR 25-54 ms short): no
+   * overlap into TH (Man Goes Down P2's IH TH lines up with it) */
+  if (next == 190)
+    cut = 0;
+  /* ASSUMPTION (2026-11-08, VoxProbe 13 section 5, all four takes: IY MM, MM IY, IY NE, NE IY 26-38 ms short):
+   * a nasal (MM NE NO NGE NGO) and a vowel or glide join with no overlap, unless either is slowed (Man Goes Down
+   * P1's three nasal joins are all slowed and keep it: P1 1502 against 1495/1502). Vowels only: Man Goes Down P2's MM
+   * EYIY, a glide, keeps it (P2 timing 29.7 -> 18.4 ms) */
+  if (both && next <= 199 && !sj->slow && !slow_before_next(sj, n)) {
+    const int kn2 = allophones[next - 128].kind;
+    if ((code >= 140 && code <= 144 && kn2 == K_VOWEL) || (next >= 140 && next <= 144 && kc == K_VOWEL))
+      cut = 0;
+  }
+  /* ASSUMPTION (2026-11-07, fitted on VoxProbe 4's vowel pairs, both units, 2600 and Stella; replaces the fixed
+   * 30 ms for these joins, an earlier finding these recordings don't support): a vowel or glide running into a
+   * vowel or glide is cut by JOIN_A - JOIN_K * d ms, d the ERB distance of F1 and F2 between its last frame and the
+   * next sound's; below zero it runs on by that much (the chip takes longer between sounds further apart: AW IY
+   * and IY AW 261/260 ms where the fixed cut gave 215, AW UW 204 where it gave 212). Nasals, liquids and voiced
+   * hisses keep the fixed cut: their table formants aren't a vowel position, and the rule put "man goes down" and
+   * Man Goes Down P2 51-145 ms long */
+  const int kn = next <= 199 ? allophones[next - 128].kind : -1;
+  /* the liquids LE LO WW RR join vowels by the same rule (2026-11-08, Man Goes Down P2's IY WW IH 30 ms short: P2
+   * timing 23.4 -> 17.0 ms, 1665 -> 1702; VoxProbe 13 section 5 10.2 -> 8.6) */
+  if (both && next != code && (kc == K_VOWEL || kc == K_GLIDE || (code >= 145 && code <= 148)) && (kn == K_VOWEL || kn == K_GLIDE || (next >= 145 && next <= 148))) {
+    const allophone *b = &allophones[next - 128];
+    if (b->kind == K_GLIDE)
+      b = &allophones[b->f1]; /* a glide's f1 f2 name the allophones it runs between: it starts on the first's */
+    const float bf[2] = {b->f1 * HZ_STEP, b->f2 * HZ_STEP};
+    float d = 0.0f;
+    for (int q = 0; q < 2; q++) {
+      const float ea = 21.4f * logf(1.0f + 0.00437f * l->to.f[q]) / SJ_LN10, eb = 21.4f * logf(1.0f + 0.00437f * bf[q]) / SJ_LN10;
+      d += ea > eb ? ea - eb : eb - ea;
+    }
+    const float ms = (JOIN_A - JOIN_K * d) * speed_factor(sj, false);
+    if (ms >= 0.0f)
+      cut = TICKS(ms);
+    else {
+      cut = 0;
+      l->ticks += TICKS(-ms);
+      sj->stotal += TICKS(-ms);
+    }
+  }
+  /* ASSUMPTION (2026-11-07, every recorded voiced-stop pair, both units): a voiced stop into a vowel or glide with
+   * no Slow on it loses 30 - 10 * d ms more off its end, d the ERB distance between its release F2 and the
+   * vowel's (BE EH 168 ms where we gave 198, DO AYWW 284 / 315; BE AW and GO OWWW, far apart, already matched) */
+  if (kc == K_VSTOP && code != 178 && code != 179 && next != code && (kn == K_VOWEL || kn == K_GLIDE)) {
+    const allophone *b = &allophones[next - 128];
+    if (b->kind == K_GLIDE)
+      b = &allophones[b->f1];
+    const float ea = 21.4f * logf(1.0f + 0.00437f * l->to.f[1]) / SJ_LN10, eb = 21.4f * logf(1.0f + 0.00437f * (b->f2 * HZ_STEP)) / SJ_LN10;
+    const float d = ea > eb ? ea - eb : eb - ea, extra = 30.0f - 10.0f * d;
+    if (extra > 0.0f) {
+      trim_tail(sj, cut + TICKS(extra * speed_factor(sj, false)));
+      l = &sj->seg[sj->nseg - 1];
+      cut = 0;
+    } else if (code != 171) {
+      /* not after BO (section 6's X BO OW 9.9 -> 9.6 ms mean) */
+      /* ASSUMPTION (2026-11-08, VoxProbe 13 section 7, both units by picture: the burst lands at the same time on
+       * every row and the vowel after it runs longer when F2 has further to go; BE OW 25 ms short -> 0, DO IY
+       * 30 -> 25; section 7 10.9 -> 9.2 ms, section 6 11.3 -> 10.7): below zero the rule lengthens the release */
+      l->ticks += TICKS(-extra * speed_factor(sj, false));
+      sj->stotal += TICKS(-extra * speed_factor(sj, false));
+    }
+  }
+  if (cut > 0 && l->ticks > cut + 1) {
+    l->ticks -= cut;
     sj->stotal -= cut;
   }
   sj->release = 0;
   sj->joined = true;
 }
+}
 
+/* Replan against the newly available FIFO context on a reusable scratch chip.
+ * Accept only if every already-rendered segment and envelope is unchanged.
+ * Late arrivals play a separate sound instead of rewriting the audible past. */
 void sj_join_pending(sj_chip *sj) {
-  if (!sj->sounding || sj->joined || !sj->executing || sj->copies > 0)
+  if (!sj->sounding || sj->joined || !sj->executing || sj->copies > 0 || sj->join_context.repeated || sj->read ||
+      sj->stotal - sj->stick < sj->release || !sj->join_scratch)
     return;
   const int code = peek(sj, 0);
-  if (code >= 128 && code <= 199)
-    join_next_sound(sj, code, sj->executing);
+  if (code < 128 || code > 199 || next_sound(sj, sj->executing) < 0)
+    return;
+  sj_chip *p = sj->join_scratch;
+  memcpy(p, sj, offsetof(sj_chip, join_scratch));
+  const join_context c = sj->join_context;
+  p->last = c.last;
+  p->last_nasal = c.nasal;
+  p->last_nge = c.nge;
+  p->after_velar = c.velar;
+  p->after_pause = c.pause;
+  p->joined = c.joined;
+  play_allophone(p, &allophones[code - 128]);
+  if (c.again) p->stotal = copy_segments(p, &allophones[code - 128]);
+  if (c.joined) p->attack = 0;
+  p->joined = false;
+  join_next_sound(p, code, sj->executing, c.nasal,
+                 c.last.a[0] > 0.0f && !c.nasal);
+  if (!p->joined || p->stotal <= sj->stick || p->nseg <= sj->cur || p->seg[sj->cur].ticks <= sj->tick)
+    return;
+  for (int k = 0; k <= sj->cur; ++k) {
+    if (k == sj->cur && sj->tick == 0) break;
+    segment a = sj->seg[k], b = p->seg[k];
+    /* A stationary span can be shortened or split without changing its past. */
+    if (k == sj->cur && memcmp(&a.from, &a.to, sizeof(frame)) == 0 &&
+        memcmp(&b.from, &b.to, sizeof(frame)) == 0)
+      a.ticks = b.ticks;
+    if (memcmp(&a, &b, sizeof(segment)) != 0) return;
+  }
+  if (sj->stick > 0 && (p->attack != sj->attack || p->onset != sj->onset ||
+      p->onset_gain != sj->onset_gain || p->wfloor != sj->wfloor ||
+      p->thump != sj->thump || p->nhk != sj->nhk ||
+      ((p->onset_from != sj->onset_from || p->release_gain != sj->release_gain) &&
+       (sj->stick >= p->onset_from || sj->stick >= sj->onset_from))))
+    return;
+  memcpy(sj->seg, p->seg, sizeof(sj->seg));
+  sj->nseg = p->nseg;
+  sj->stotal = p->stotal;
+  sj->release = p->release;
+  sj->onset_from = p->onset_from;
+  sj->release_gain = p->release_gain;
+  sj->joined = true;
 }
 
 /* take the next command from the buffer and start it. the command stays
@@ -1124,14 +1583,20 @@ static void next_command(sj_chip *sj) {
     const uint8_t data = n == 2 ? (uint8_t)peek(sj, 1) : 0;
     sj->executing = n;
     if (code <= 6) {
-      play_pause(sj, T.pause[code]);
+      play_pause(sj, T.pause[code] * (sj->speed > 114 ? speed_step(sj) : (T.fx_speed_a - sj->speed) / T.fx_speed_b));
       sj->joined = false;
     } else if (code >= 128 && code <= 199) {
       /* a sound played straight after the same sound (joined, controls between allowed) plays as a Repeat copy of
        * it (VoxProbe 12, 2026-11-05, both units, 2600 and Stella: AY AY 208 ms, AW AW AW 255, UX UX UX 260 - what
        * Repeat 2 / 3 makes, 214 / 268 / 259 - not two whole sounds, 272 / 316 / 329; a Pitch or Speed between the
        * copies doesn't change it: AW Pitch 88 AW Pitch 88 AW 256) */
-      const bool again = sj->joined && sj->copy_of == code - 128 && sj->repeat <= 1;
+      /* a Slow on the second breaks it: two whole sounds (2026-11-08, VoxProbe 13 section 10, all four takes: AW Slow SE
+       * Slow SE UX 464 ms, 435 as a copy) */
+      const bool again = sj->joined && sj->copy_of == code - 128 && sj->repeat <= 1 && !sj->slow;
+      const bool prev_nasal = sj->last_nasal;
+      const bool prev_kind_vowel = sj->last.a[0] > 0.0f && !sj->last_nasal;
+      sj->join_context = (join_context){sj->last, sj->last_nasal, sj->last_nge,
+          sj->after_velar, sj->after_pause, sj->joined, again, sj->repeat > 1};
       play_allophone(sj, &allophones[code - 128]);
       if (again) {
         sj->stotal = copy_segments(sj, &allophones[code - 128]);
@@ -1147,7 +1612,7 @@ static void next_command(sj_chip *sj) {
       if (sj->joined)
         sj->attack = 0;
       sj->joined = false;
-      join_next_sound(sj, code, n);
+      join_next_sound(sj, code, n, prev_nasal, prev_kind_vowel);
     } else if (code >= 200 && code <= 254) {
       play_effect(sj, code);
       sj->repeat = 0;
@@ -1163,13 +1628,14 @@ static void next_command(sj_chip *sj) {
       case 22: sj->pitch = data; break;
       case 23: sj->bend = data > 15 ? 15 : data; break;
       case 26: sj->repeat = data; break;
-      case 30: play_pause(sj, data * 10.0); break;
+      case 30: play_pause(sj, data * 10.0f); break;
       case 31: reset_controls(sj); break;
       default: break; /* 16 wait, 24/25 ports, 28/29 eeprom, 255: nothing */
       }
     }
     if (!sj->sounding) {
       /* the command is done at once */
+      sj->retired_bytes += n;
       sj->head = (sj->head + n) % SJ_BUFFER_SIZE;
       sj->count -= n;
       sj->executing = 0;
@@ -1182,6 +1648,7 @@ static void finish_sound(sj_chip *sj) {
   const int code = peek(sj, 0);
   if (code >= 128)
     sj->fast = sj->slow = sj->stress = sj->relax = false;
+  sj->retired_bytes += sj->executing + sj->ahead;
   sj->head = (sj->head + sj->executing + sj->ahead) % SJ_BUFFER_SIZE;
   sj->count -= sj->executing + sj->ahead;
   sj->executing = 0;
@@ -1195,7 +1662,7 @@ static float lerp(float a, float b, float t) { return a + (b - a) * t; }
 
 static inline float rnd(sj_chip *sj) {
   sj->rnd = sj->rnd * 1664525u + 1013904223u;
-  return (sj->rnd >> 8) * (1.0 / 16777216.0) - 0.5;
+  return (sj->rnd >> 8) * (1.0f / 16777216.0f) - 0.5f;
 }
 
 /* one chip sample */
@@ -1223,9 +1690,9 @@ static void read_ahead(sj_chip *sj) {
     for (int k = 0; k < sj->nseg; k++) {
       segment *g = &sj->seg[k];
       if (k == sj->cur)
-        g->ticks = sj->tick + 1 + (int)((g->ticks - sj->tick - 1) * scale + 0.5);
+        g->ticks = sj->tick + 1 + (int)((g->ticks - sj->tick - 1) * scale + 0.5f);
       else if (k > sj->cur)
-        g->ticks = g->ticks * scale < 1.0 ? 1 : (int)(g->ticks * scale + 0.5);
+        g->ticks = g->ticks * scale < 1.0f ? 1 : (int)(g->ticks * scale + 0.5f);
       total += g->ticks;
     }
     sj->stotal = total;
@@ -1244,24 +1711,24 @@ static float output_stage(sj_chip *sj, float v, bool voice) {
   /* the output stage's nonlinearity and its step size */
   v += T.dist2 * v * v + T.dist3 * v * v * v;
   if (T.quant > 0)
-    v = floorf(v * T.quant + 0.5) / T.quant;
+    v = floorf(v * T.quant + 0.5f) / T.quant;
   /* the output noise floor: white under the effects' tones; none under the
    * voice (T.floor 0, the chip's voice is exactly periodic) */
   {
     const float r = rnd(sj);
     if (voice)
-      v *= 1.0 + T.floor * 2.0 * (r - sj->lastr);
+      v *= 1.0f + T.floor * 2.0f * (r - sj->lastr);
     else {
       /* the effects' bed (both units): timing error, proportional to the
        * signal's change per tick smoothed by one pole - it grows with the
        * tone's frequency to about 1.5 kHz and only with its level above */
       /* the buzz's clicks are kept out of the slope (each one is a huge step: the bed turned 227 B7's bands into loud noise) */
       sj->bed += BED_POLE * (v - sj->vbuzz - sj->vprev - sj->bed);
-      v += SLEW * 2.0 * r * sj->bed;
+      v += SLEW * 2.0f * r * sj->bed;
     }
     sj->lastr = r;
     sj->vprev = v - sj->vbuzz; /* without the buzz: unchanged for every sound without one */
-    sj->vbuzz = 0.0;
+    sj->vbuzz = 0.0f;
   }
   return v;
 }
@@ -1277,12 +1744,12 @@ static bool scp_audible(const sj_chip *sj) {
 
 static float scp_tick(sj_chip *sj) {
   const int ctl = sj->reg[8], rate = sj->reg[0];
-  float env = 1.0;
+  float env = 1.0f;
   if (ctl & 0xc0) {
     if (rate <= 0)
-      env = 0.0;
+      env = 0.0f;
     else {
-      int period = (int)ceilf(8000.0 / rate);
+      int period = (int)ceilf(8000.0f / rate);
       switch (rate) {
       case 44: case 51: case 53: case 56: case 63: case 77: case 87: case 88: case 92: case 104: case 127: case 151:
         period++;
@@ -1291,24 +1758,24 @@ static float scp_tick(sj_chip *sj) {
         sj->eage = 0;
       if (sj->eage == 0 && (ctl & 0x40))
         for (int k = 0; k < 3; k++)
-          sj->sph[k] = 0.0; /* the enveloped tones restart with each pulse, as the voice's */
+          sj->sph[k] = 0.0f; /* the enveloped tones restart with each pulse, as the voice's */
       const int age = sj->eage++;
       const float x = (float)age / period;
       switch (ctl & 3) {
-      case 1: env = 0.5 + 0.5 * sj_sin2pi(x + 0.25); break;
+      case 1: env = 0.5f + 0.5f * sj_sin2pi(x + 0.25f); break;
       case 2: env = x; break;
-      case 3: env = x < 0.5 ? 1.0 : 0.0; break;
+      case 3: env = x < 0.5f ? 1.0f : 0.0f; break;
       default:
-        env = age < T.env_rise ? (float)age / T.env_rise : 1.0 - (float)(age - T.env_rise) / T.env_fall;
-        if (env < 0.0)
-          env = 0.0;
+        env = age < T.env_rise ? (float)age / T.env_rise : 1.0f - (float)(age - T.env_rise) / T.env_fall;
+        if (env < 0.0f)
+          env = 0.0f;
       }
     }
   }
-  float s13 = 0.0, s45 = 0.0;
+  float s13 = 0.0f, s45 = 0.0f;
   for (int k = 0; k < 5; k++) {
     const float a = sj->reg[11 + k], f = sj->reg[1 + k];
-    if (a > 0.0 && f > 0.0) {
+    if (a > 0.0f && f > 0.0f) {
       if (k < 3)
         s13 += a * sj_sin2pi(sj->sph[k]);
       else
@@ -1316,49 +1783,53 @@ static float scp_tick(sj_chip *sj) {
     }
     float step = f / NOMINAL;
     if (k >= 3 && sj->reg[6] > 0)
-      step *= 1.0 + sj->reg[6] / 255.0 * 2.0 * rnd(sj);
+      step *= 1.0f + sj->reg[6] / 255.0f * 2.0f * rnd(sj);
     sj->sph[k] = advance_phase(sj->sph[k], step);
   }
   /* mixer 1's limit of 63 */
   if (T.clip > 0)
     s13 = s13 > T.clip ? T.clip : s13 < -T.clip ? -T.clip : s13;
-  float v = 0.0;
+  float v = 0.0f;
   if (ctl & 0x40)
-    v -= env * s13 / 128.0; /* enveloped, as the voice: the pulse starts downward */
+    v -= env * s13 / 128.0f; /* enveloped, as the voice: the pulse starts downward */
   else
-    v += s13 / 128.0 * 0.6; /* plain, as the effects' tones */
-  v += (ctl & 0x80 ? 0.5 * env + 0.5 : 1.0) * s45 / 128.0 * 0.6;
-  v *= 1.9724227361148539; /* SCP_DB as a factor, written out so every compiler gets the same */
+    v += s13 / 128.0f * 0.6f; /* plain, as the effects' tones */
+  v += (ctl & 0x80 ? 0.5f * env + 0.5f : 1.0f) * s45 / 128.0f * 0.6f;
+  v *= 1.9724227361148539f; /* SCP_DB as a factor, written out so every compiler gets the same */
   return output_stage(sj, v, true); /* no bed: under a register tone it is 57 dB down (VoxProbe 10, all three takes) */
 }
 
 static float tick(sj_chip *sj) {
+  sj->tick_code = 0;
+  sj->tick_position = sj->retired_bytes;
   if (!sj->sounding)
     next_command(sj);
   if (!sj->sounding)
-    return scp_audible(sj) ? scp_tick(sj) : 0.0;
+    return scp_audible(sj) ? scp_tick(sj) : 0.0f;
   if (!sj->read && sj->copies == 0 && peek(sj, 0) >= 128) {   /* sounds only: no recording shows a pause reading ahead */
     const bool fade = (sj->seg[sj->nseg - 1].flags & FX_FADE) != 0;
     if (fade ? sj->cur == sj->nseg - 1 : sj->stotal - sj->stick <= TICKS(READ_AHEAD_MS))
       read_ahead(sj);
   }
 
+  sj->tick_code = (uint8_t)(peek(sj, 0) >= 128 ? peek(sj, 0) : 0);
+  sj->tick_position = sj->retired_bytes;
   const segment *s = &sj->seg[sj->cur];
-  const float t = s->ticks > 1 ? (float)sj->tick / (s->ticks - 1) : 1.0;
+  const float t = s->ticks > 1 ? (float)sj->tick / (s->ticks - 1) : 1.0f;
   frame f;
   for (int k = 0; k < 3; k++) {
     const float fa = s->from.f[k], fb = s->to.f[k];
     if ((s->flags & FX_EXP) && fa > 0 && fb > 0)
       f.f[k] = (float)(fa * expf(t * logf(fb / fa)));
     else if (s->flags & FX_EXPDECAY)
-      f.f[k] = (float)(fb + (fa - fb) * expf(-4.0 * t));
+      f.f[k] = (float)(fb + (fa - fb) * expf(-4.0f * t));
     else
       f.f[k] = (float)lerp(fa, fb, t);
     f.a[k] = (float)lerp(s->from.a[k], s->to.a[k], t);
   }
   f.lv = (float)lerp(s->from.lv, s->to.lv, t);
   if (s->lr != 0.0f)
-    f.lv *= (float)expf(s->lr * t * (0.5 * M_LN10 / 20.0));
+    f.lv *= (float)expf(s->lr * t * (0.5f * SJ_LN10 / 20.0f));
   f.nf = (float)lerp(s->from.nf, s->to.nf, t);
   f.nw = (float)lerp(s->from.nw, s->to.nw, t);
   f.na = (float)lerp(s->from.na, s->to.na, t);
@@ -1377,7 +1848,7 @@ static float tick(sj_chip *sj) {
     for (int k = 0; k < 3; k++) sj->xa[k] = f.a[k];
   sj->last = f;
 
-  float v = 0.0;
+  float v = 0.0f;
 
   /* voicing */
   /* FX_SMOOTH: where voicing starts after unvoiced sound, the voice comes in over 3 ms (24 ticks) instead of at once (a
@@ -1400,13 +1871,13 @@ static float tick(sj_chip *sj) {
        * Pitch 60, 88 and 150 on both units, gliding within the part) */
       /* the offset from integers and one division, so every compiler gets the same period */
       float rate = sj->pitch + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
-      if (rate < 10.0)
-        rate = 10.0;
+      if (rate < 10.0f)
+        rate = 10.0f;
       /* the voice counts a 16-bit phase up by floorf(rate * 65536 / 8000) a tick: floorf(65536 / step) + 1 ticks
        * (VoxProbe 2's Pitch sweep 20-255, both units: every Pitch to measuring precision, where floorf(8000 / Pitch) + 1
        * missed 27; it is why the reset default, Pitch 88, runs 92 ticks) */
-      const int step = (int)(rate * 65536.0 / 8000.0);
-      sj->period = s->flags & (FX_VOICED | FX_PULSED) ? (int)ceilf(8000.0 / rate) : 65536 / step + 1;
+      const int step = (int)(rate * 65536.0f / 8000.0f);
+      sj->period = s->flags & (FX_VOICED | FX_PULSED) ? (int)ceilf(8000.0f / rate) : 65536 / step + 1;
       /* an effect's pulse: one tick more at twelve rates (VoxProbe 10's register sweep, both units) */
       if ((s->flags & (FX_VOICED | FX_PULSED)) && rate == (int)rate)
         switch ((int)rate) {
@@ -1419,50 +1890,50 @@ static float tick(sj_chip *sj) {
     const int nf = !(s->flags & FX_VOICED) || (s->flags & FX_ALL) ? 3 : s->flags & FX_ONE ? 1 : 2; /* FX_ALL: every tone pulses with the voice */
     if (sj->ptick == sj->period && !(s->flags & FX_PULSED)) /* pulsed tones run on; the enveloped ones restart, a plain tone beside them runs on */
       for (int k = 0; k < nf; k++)
-        sj->phase[k] = 0.0;
+        sj->phase[k] = 0.0f;
     const int age = sj->period - sj->ptick;
     float env;
     const float x = (float)age / sj->period;
     switch (s->flags & FX_SHAPE) {
-    case FX_SINE: env = 0.5 + 0.5 * sj_sin2pi(x + 0.25); break;
+    case FX_SINE: env = 0.5f + 0.5f * sj_sin2pi(x + 0.25f); break;
     case FX_TRI: env = x; break; /* VoxProbe 7, both units: a rising ramp, then straight back to nothing */
-    case FX_SQUARE: env = x < 0.5 ? 1.0 : 0.0; break;
+    case FX_SQUARE: env = x < 0.5f ? 1.0f : 0.0f; break;
     default:
-      env = age < T.env_rise ? (float)age / T.env_rise : 1.0 - (float)(age - T.env_rise) / T.env_fall;
-      if (env < 0.0)
-        env = 0.0;
+      env = age < T.env_rise ? (float)age / T.env_rise : 1.0f - (float)(age - T.env_rise) / T.env_fall;
+      if (env < 0.0f)
+        env = 0.0f;
     }
     /* the offset: measured on every voiced sound's pulse (both units), an
      * envelope-shaped term beside the sines, against their starting direction */
-    float sum = 0.0;
+    float sum = 0.0f;
     for (int k = 0; k < nf; k++) {
       sum += f.a[k] * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0 + T.jitter * 2.0 * rnd(sj)) / NOMINAL);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) / NOMINAL);
     }
     /* mixer 1's limit: the manual says the three volumes must total 63 or
      * less; past it the sum clips */
     if (T.clip > 0)
       sum = sum > T.clip ? T.clip : sum < -T.clip ? -T.clip : sum;
-    v -= sj->xv * env * sum / 128.0 * f.lv * (s->flags & FX_PULSED ? 0.6 : 1.0); /* the pulse starts downward (both units, every vowel at Pitch 20) */
+    v -= sj->xv * env * sum / 128.0f * f.lv * (s->flags & FX_PULSED ? 0.6f : 1.0f); /* the pulse starts downward (both units, every vowel at Pitch 20) */
     sj->venv = env;
     for (int k = nf; k < 3; k++) {
-      v += f.a[k] / 128.0 * 0.6 * f.lv * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0 + T.jitter * 2.0 * rnd(sj)) / NOMINAL);
+      v += f.a[k] / 128.0f * 0.6f * f.lv * sj_sin2pi(sj->phase[k]);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) / NOMINAL);
     }
     sj->ptick--;
   } else {
     sj->ptick = 0;
-    sj->venv = 1.0;
+    sj->venv = 1.0f;
     /* FX_WANDER: 252 M0's tone drifts about +-1.5 % over tens of ms on both units: white noise through a one-pole low-pass */
-    sj->wander += (WANDER_DEPTH / (0.57735 * sqrtf(WANDER_RATE / 2.0)) * rnd(sj) - sj->wander) * WANDER_RATE; /* the input scaled so the drift's rms is WANDER_DEPTH */
-    sj->am += (AM_DEPTH / (0.57735 * sqrtf(AM_RATE / 2.0)) * rnd(sj) - sj->am) * AM_RATE;
+    sj->wander += (WANDER_DEPTH / (0.57735f * sqrtf(WANDER_RATE / 2.0f)) * rnd(sj) - sj->wander) * WANDER_RATE; /* the input scaled so the drift's rms is WANDER_DEPTH */
+    sj->am += (AM_DEPTH / (0.57735f * sqrtf(AM_RATE / 2.0f)) * rnd(sj) - sj->am) * AM_RATE;
     /* plain tones (the effects) */
     for (int k = 0; k < 3; k++) {
       if (f.f[k] > 0.0f && f.a[k] > 0.0f)
-        v += f.a[k] / 128.0 * 0.6 * f.lv * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0 + (s->flags & FX_WANDER ? sj->wander : 0.0)) / NOMINAL);
+        v += f.a[k] / 128.0f * 0.6f * f.lv * sj_sin2pi(sj->phase[k]);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + (s->flags & FX_WANDER ? sj->wander : 0.0f)) / NOMINAL);
     }
-    v *= 1.0 + sj->am * (s->flags & FX_WANDER ? 1.0 : AM_STEADY / AM_DEPTH); /* the full wobble only on a wandering part (M0) */
+    v *= 1.0f + sj->am * (s->flags & FX_WANDER ? 1.0f : AM_STEADY / AM_DEPTH); /* the full wobble only on a wandering part (M0) */
   }
 
   if (f.na > 0.0f) {
@@ -1471,7 +1942,14 @@ static float tick(sj_chip *sj) {
       const int phase = sj->tick % s->gate;
       filter = s->sweep ? s->sweep[phase] : swept_band(f.nf, f.nw, phase, s->gate);
     } else {
-      filter = noise_band(f.nf, f.nw, 1.0f);
+      /* A stationary noise band otherwise repeats exp/sqrt at every tick.
+       * Cache exact coefficients; moving bands still take the original path. */
+      if (!sj->noise_cached || sj->cached_nf != f.nf || sj->cached_nw != f.nw) {
+        sj->cached_noise = noise_band(f.nf, f.nw, 1.0f);
+        sj->cached_nf = f.nf; sj->cached_nw = f.nw;
+        sj->noise_cached = true;
+      }
+      filter = sj->cached_noise;
     }
     float lvl = filter.level;
     /* FX_BUZZ: the noise minus itself one period of the part's pulse rate ago (Pitch plus its offset, ceilf(8000 /
@@ -1481,21 +1959,21 @@ static float tick(sj_chip *sj) {
     if (s->flags & FX_BUZZ) {
       /* clicks, not noise: an impulse every voice period (Pitch), so the column is an even broadband colour; the comb
        * below then cuts narrow notches every rate Hz (user, C2: plain orange with narrow, regular purple stripes) */
-      const int vper = sj->pitch > 0 ? (int)(8000.0 / sj->pitch) + 1 : 92;
+      const int vper = sj->pitch > 0 ? (int)(8000.0f / sj->pitch) + 1 : 92;
       if (sj->bzclk <= 0)
         sj->bzclk = vper;
-      ex = sj->bzclk == vper ? sqrtf(vper / 12.0) : 0.0;
+      ex = sj->bzclk == vper ? sqrtf(vper / 12.0f) : 0.0f;
       sj->bzclk--;
       float rate = sj->pitch + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
-      if (rate < 10.0)
-        rate = 10.0;
-      int per = (int)ceilf(8000.0 / rate);
+      if (rate < 10.0f)
+        rate = 10.0f;
+      int per = (int)ceilf(8000.0f / rate);
       if (per > 1023)
         per = 1023;
       const float old = sj->bzbuf[(sj->bzpos - per) & 1023];
       sj->bzbuf[sj->bzpos & 1023] = ex;
       sj->bzpos++;
-      ex = (ex - 0.6 * old) * 0.8574929257125441 * 0.25; /* 1 / sqrtf(1 + 0.6^2): notches dim, not black (user, C2); x0.25: the bands sit 12 dB under a noise band of the same byte, so the low levels the chip needs have fine steps (B7's were pinned at byte 2, still too bright) */
+      ex = (ex - 0.6f * old) * 0.8574929257125441f * 0.25f; /* 1 / sqrtf(1 + 0.6^2): notches dim, not black (user, C2); x0.25: the bands sit 12 dB under a noise band of the same byte, so the low levels the chip needs have fine steps (B7's were pinned at byte 2, still too bright) */
     }
     const float y = filter.gain * ex + filter.feedback * sj->nz[0] -
                     filter.radius2 * sj->nz[1];
@@ -1507,8 +1985,8 @@ static float tick(sj_chip *sj) {
      * takes with the background taken off: 6-21 dB too much under 400 Hz without it) */
     float yo = y;
     /* and the swept noise (C8, C9) at NSWEEP_HP (2026-11-06: ~10 dB heavy under 300 Hz without it) */
-    if (!sj->effect || (s->flags & FX_NSWEEP)) {
-      const float k = sj->effect ? NSWEEP_HPK : sj->nhk;
+    if (!sj->effect || (s->flags & FX_NSWEEP) || sj->fxhpk > 0.0f) {
+      const float k = sj->effect ? (sj->fxhpk > 0.0f ? sj->fxhpk : NSWEEP_HPK) : sj->nhk;
       const float o1 = k * (sj->nhp[1] + y - sj->nhp[0]);
       sj->nhp[0] = y;
       sj->nhp[1] = o1;
@@ -1517,23 +1995,23 @@ static float tick(sj_chip *sj) {
       sj->nhp[3] = o2;
       yo = (NHP_TWO ? o2 : o1) + sj->wfloor * ex;
     }
-    if (sj->thump > 0.0 && sj->stick < TICKS(THUMP_MS)) { /* low noise (one pole at THUMP_HZ) fading over THUMP_MS */
+    if (sj->thump > 0.0f && sj->stick < TICKS(THUMP_MS)) { /* low noise (one pole at THUMP_HZ) fading over THUMP_MS */
       sj->thlp += sj->thk * (ex - sj->thlp);
-      yo += sj->thump * sj->thlp * (1.0 - (float)sj->stick / TICKS(THUMP_MS));
+      yo += sj->thump * sj->thlp * (1.0f - (float)sj->stick / TICKS(THUMP_MS));
     }
-    v += lvl * f.lv * f.na / 128.0 * 0.86 * yo;
+    v += lvl * f.lv * f.na / 128.0f * 0.86f * yo;
     if (s->flags & FX_BUZZ)
-      sj->vbuzz = lvl * f.lv * f.na / 128.0 * 0.86 * y;
+      sj->vbuzz = lvl * f.lv * f.na / 128.0f * 0.86f * y;
   }
 
   if (s->gate > 0 && !(s->flags & FX_NSWEEP) && sj->tick % s->gate >= s->gate / 2)
     v *= T.gate_depth;
   if (s->flags & FX_DECAY)
-    v *= expf(-T.decay_db * t / 20.0 * M_LN10);
+    v *= expf(-T.decay_db * t / 20.0f * SJ_LN10);
   if (s->flags & FX_FADE)
-    v *= 1.0 - t; /* the tones' ending, measured: the level falls straight to nothing (-6 dB at half way, -20 at nine tenths) */
+    v *= 1.0f - t; /* the tones' ending, measured: the level falls straight to nothing (-6 dB at half way, -20 at nine tenths) */
   if (s->flags & FX_BUMP)
-    v *= sj_sin2pi(0.5 * t);
+    v *= sj_sin2pi(0.5f * t);
 
   /* the sound's attack and release */
   {
@@ -1546,9 +2024,9 @@ static float tick(sj_chip *sj) {
       v *= sj->onset_gain;
     if (sj->onset_from > 0 && sj->stick >= sj->onset_from)
       v *= sj->release_gain;
-    if (sj->fxburst > 0.0 && sj->stick < TICKS(FXBURST_MS)) {
-      sj->fxblp += sj->fxbk * (2.0 * rnd(sj) - sj->fxblp);
-      v += sj->fxburst * sj->fxblp * (1.0 - (float)sj->stick / TICKS(FXBURST_MS));
+    if (sj->fxburst > 0.0f && sj->stick < TICKS(sj->fxbms)) {
+      sj->fxblp += sj->fxbk * (2.0f * rnd(sj) - sj->fxblp);
+      v += sj->fxburst * sj->fxblp * (1.0f - (float)sj->stick / TICKS(sj->fxbms));
     }
   }
   sj->stick++;
@@ -1576,20 +2054,27 @@ static float tick(sj_chip *sj) {
   return v;
 }
 
-SJ_RAM_CODE bool sj_render(sj_chip *sj, float *buf, size_t n) {
+SJ_RAM_CODE bool sj_render_tagged(sj_chip *sj, float *buf, sj_trace *trace, size_t n) {
   const float decay1 = sj->decay1, decay2 = sj->decay2;
   const float coupling = sj->coupling, zeroMix = sj->zeroMix;
   bool sounding = sj->sounding || sj->count > 0 || scp_audible(sj);
   for (size_t i = 0; i < n; i++) {
+    if (trace) trace[i] = (sj_trace){sj->held_position, sj->held_code};
     /* Filter the sample held for the preceding tick, then advance the chip. */
     const float x = sj->held;
     const float u1 = sj->z[0] - x;
     sj->z[0] = x + u1 * decay1;
     sj->z[1] = x + (sj->z[1] - x) * decay2 + u1 * coupling;
     sj->held = tick(sj);
+    sj->held_code = sj->tick_code;
+    sj->held_position = sj->tick_position;
     sounding = sounding || sj->sounding || sj->count > 0 || scp_audible(sj);
     buf[i] = sj->z[1] + zeroMix * (sj->z[0] - sj->z[1]);
   }
   sj->speaking = sounding;
   return sounding;
+}
+
+bool sj_render(sj_chip *sj, float *buf, size_t n) {
+  return sj_render_tagged(sj, buf, NULL, n);
 }
