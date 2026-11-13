@@ -1,15 +1,19 @@
-# Talko 2 SpeakJet 0.7 prototype
+# Talko 2 SpeakJet 0.8 prototype
 
 SpeakJet firmware for the **Talko 2 (RP2040)**. It brings the Emy-style
 banks of vowels, allophones and effects to Talko, along with a bank of spoken
 digits. In Queue mode, closely spaced triggers can blend phonemes into a
 continuous voice.
 
+At startup, SpeakJet says “zero point eight” as the front display shows
+`0`, the dot, then `8`. The rear LED flashes blue once and green eight
+times. Red flashes count the major version when it is above zero.
+
 ## Install and play
 
 1. Connect Talko with a USB data cable. Hold **BOOTSEL**, press and release
    **RESET**, then release **BOOTSEL** when the `RPI-RP2` drive appears.
-2. Copy [Talko_SpeakJet-0.7.uf2](Talko_SpeakJet-0.7.uf2) to that drive.
+2. Copy [Talko_SpeakJet-0.8.uf2](Talko_SpeakJet-0.8.uf2) to that drive.
    Talko restarts automatically.
 3. Move the switch **left**, turn the encoder to bank **0**, and turn
    **SOUND** fully counterclockwise. Press **SPEAK** to hear **HELLO**.
@@ -20,8 +24,8 @@ continuous voice.
 |---|---|
 | Encoder turn | Select a bank. The display shows its number. |
 | SOUND knob or CV | Select an entry within the current bank. |
-| SPEAK button or GATE input | Trigger the selected entry. The display dot lights during playback. |
-| SPEED, PITCH, FX and ERROR | Voice settings are fixed in 0.7. Select built-in effects with SOUND in bank 6. |
+| SPEAK button or GATE input | Trigger the selected entry. |
+| SPEED, PITCH, FX and ERROR | Voice settings are fixed in 0.8. Select built-in effects with SOUND in bank 6. |
 
 | Switch | Mode | Action |
 |---|---|---|

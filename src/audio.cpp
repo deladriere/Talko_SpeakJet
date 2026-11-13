@@ -1,5 +1,6 @@
 #include "audio.h"
 #include "banks.h"
+#include "talko_startup.h"
 
 #include <Arduino.h>
 #include <atomic>
@@ -21,6 +22,9 @@ constexpr uint PrefillSamples = BlockSamples * 2;
 // Leave room for a new gate to affect a phoneme that is still playing.
 constexpr uint QueueAheadSamples = BlockSamples * 4;
 constexpr uint PendingCapacity = 16;
+constexpr uint8_t StartupBank = BankCount;
+// SpeakJet allophones PO, OWIY, NE, TT.
+constexpr uint8_t point[] = {199, 156, 141, 191};
 static_assert((RingSize & RingMask) == 0 &&
               RingSize >= QueueAheadSamples && QueueAheadSamples >= PrefillSamples);
 
@@ -116,6 +120,10 @@ bool cancelled(const Request &request) {
 }
 
 Entry bankEntry(const Request &request) {
+  if (request.bank == StartupBank) {
+    return request.item == TalkoStartup::Point ? phrase("POINT", point)
+                                               : spokenDigits[request.item];
+  }
   const Bank &bank = banks[request.bank];
   if (bank.entries) {
     return bank.entries[request.item];
@@ -324,8 +332,7 @@ void loop1() {
 }
 
 void triggerAudio(uint8_t bank, uint8_t item, PlaybackMode mode) {
-  if (mode == PlaybackMode::Speech &&
-      (!queue_is_empty(&requests) || requestActive.load(std::memory_order_acquire))) {
+  if (mode == PlaybackMode::Speech && audioBusy()) {
     return;
   }
   const Request request{gateEpoch.load(std::memory_order_relaxed), bank, item, mode};
@@ -340,8 +347,14 @@ void stopAudio() {
                   std::memory_order_release);
 }
 
-bool audioPlaying() {
-  return playing.load(std::memory_order_relaxed);
+void sayStartupPart(uint8_t part) {
+  if (part <= TalkoStartup::Point) {
+    triggerAudio(StartupBank, part, PlaybackMode::Speech);
+  }
+}
+
+bool audioBusy() {
+  return !queue_is_empty(&requests) || requestActive.load(std::memory_order_acquire);
 }
 
 void serviceConsole() {
@@ -365,9 +378,10 @@ void serviceConsole() {
     int count;
     if (!connected) {
       count = snprintf(line, sizeof(line),
-                       "Talko 2 SpeakJet bench v0.7 mode=native engine=%s sample_hz=%u "
+                       "Talko 2 SpeakJet bench v%u.%u mode=native engine=%s sample_hz=%u "
                        "block_samples=%u budget_us=%u prefill_samples=%u\r\n",
-                       SJ_VERSION, unsigned(SJ_SAMPLE_RATE), BlockSamples, BlockBudgetUs,
+                       unsigned(VersionMajor), unsigned(VersionMinor), SJ_VERSION,
+                       unsigned(SJ_SAMPLE_RATE), BlockSamples, BlockBudgetUs,
                        PrefillSamples);
       connected = true;
     } else if (queue_try_remove(&reports, &report)) {

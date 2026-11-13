@@ -5,6 +5,7 @@
 
 #include "audio.h"
 #include "banks.h"
+#include "talko_startup.h"
 
 namespace {
 
@@ -20,10 +21,7 @@ constexpr uint SoundMax = 4000;
 constexpr uint DisplayBrightness = 100;
 constexpr uint GateDebounceUs = 4000;
 
-constexpr uint8_t Digits[] = {
-    0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07, 0x7f,
-};
-static_assert(sizeof(Digits) == BankCount);
+static_assert(BankCount <= sizeof(TalkoStartup::Digits));
 
 uint8_t selectedBank = 0;
 uint8_t lastEncoderState = 0;
@@ -72,9 +70,8 @@ void encoderInterrupt() {
   }
 }
 
-void updateDisplay(bool playing) {
+void drawDisplay(uint8_t mask) {
   static uint8_t previous = 0xff;
-  uint8_t mask = Digits[selectedBank] | (playing ? 0x80 : 0);
   if (mask == previous) {
     return;
   }
@@ -87,6 +84,7 @@ void updateDisplay(bool playing) {
 } // namespace
 
 void setup() {
+  TalkoStartup::prepareLed();
   Serial.begin(115200);
   pinMode(GatePin, INPUT_PULLUP);
   pinMode(EncoderA, INPUT_PULLUP);
@@ -103,6 +101,7 @@ void setup() {
   analogReadResolution(12);
   filteredSound = analogRead(SoundPot) * 8;
   setupAudio();
+  TalkoStartup::showVersion(VersionMajor, VersionMinor, drawDisplay, sayStartupPart, audioBusy);
 
   lastGateEdge = micros() - GateDebounceUs;
   attachInterrupt(digitalPinToInterrupt(GatePin), gateInterrupt, CHANGE);
@@ -110,7 +109,7 @@ void setup() {
   lastEncoderState = encoderState();
   attachInterrupt(digitalPinToInterrupt(EncoderA), encoderInterrupt, CHANGE);
   attachInterrupt(digitalPinToInterrupt(EncoderB), encoderInterrupt, CHANGE);
-  updateDisplay(false);
+  drawDisplay(TalkoStartup::Digits[selectedBank]);
 }
 
 void loop() {
@@ -150,6 +149,6 @@ void loop() {
     uint8_t item = (value * bank.count) / (SoundMax + 1);
     triggerAudio(selectedBank, item, mode);
   }
-  updateDisplay(audioPlaying());
+  drawDisplay(TalkoStartup::Digits[selectedBank]);
   serviceConsole();
 }
