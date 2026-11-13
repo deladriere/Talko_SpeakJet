@@ -1,5 +1,6 @@
 #include "audio.h"
 #include "banks.h"
+#include "dsp.h"
 #include "talko_startup.h"
 
 #include <Arduino.h>
@@ -22,9 +23,10 @@ constexpr uint RingSize = 1024;
 constexpr uint RingMask = RingSize - 1;
 constexpr uint PrefillSamples = BlockSamples * 2;
 // Leave room for a new gate to affect a phoneme that is still playing.
-constexpr uint QueueAheadSamples = BlockSamples * 4;
+constexpr uint QueueAheadSamples = BlockSamples * 3;
 constexpr uint PendingCapacity = 16;
 constexpr uint8_t StartupBank = BankCount;
+constexpr uint8_t FreezeBank = BankCount + 2;
 // SpeakJet allophones PO, OWIY, NE, TT.
 constexpr uint8_t point[] = {199, 156, 141, 191};
 static_assert((RingSize & RingMask) == 0 &&
@@ -54,6 +56,20 @@ struct Report {
   uint8_t bufferBytes;
 };
 
+std::atomic<uint32_t> performance{(256u<<16)|256u};
+std::atomic<uint32_t> effectControl{uint32_t(Fx::Delay)<<16};
+std::atomic<uint16_t> speedControl{2048};
+std::atomic<bool> errorControl{false},frozen{false},voiceBusy{false};
+std::atomic<uint8_t> synthBuffered{0};
+PanelControls panelSnapshot;
+#ifdef TALKO_DIAGNOSTICS
+PanelControls injectedControls;
+bool injected=false;
+#endif
+bool panelPending=true;
+bool panelMonitor=false;
+Dsp::Effects effects;
+Dsp::Freeze freeze;
 queue_t requests;
 queue_t reports;
 struct PlaybackEvent { uint16_t label; }; // zero means STOP
@@ -154,6 +170,7 @@ bool cancelled(const Request &request) {
 }
 
 Entry bankEntry(const Request &request) {
+  if (request.bank == FreezeBank) return {"ERROR", point, 0, 0};
   if (request.byteCount) return {"RAW", request.bytes, request.byteCount, 0};
   if (request.bank == StartupBank) {
     return request.item == TalkoStartup::Point ? phrase("POINT", point)
@@ -188,7 +205,7 @@ void appendQueued(uint32_t epoch) {
          next.epoch == epoch && !cancelled(next)) {
     const Entry entry = bankEntry(next);
     const int length = entry.bytes ? entry.count : 1;
-    if (sj_buffered(chip) + length > SJ_BUFFER_SIZE || markerWrite - markerRead >= 64) {
+    if (sj_buffer_half_full(chip) || sj_buffered(chip) + length > SJ_BUFFER_SIZE || markerWrite - markerRead >= 64) {
       break;
     }
     // Core 1 is the only consumer. Gate cuts invalidate requests by epoch.
@@ -210,10 +227,11 @@ void appendQueued(uint32_t epoch) {
 
 void renderEntry(const Request &request) {
   Report report{request, Event::Play};
-  if (chip) {
+  const bool idleFreeze = request.bank == FreezeBank;
+  if (chip && !idleFreeze) {
     sj_power_on(chip);
   }
-  if (!chip || !loadEntry(bankEntry(request))) {
+  if (!chip || (!idleFreeze && !loadEntry(bankEntry(request)))) {
     report.event = Event::Error;
     queue_try_add(&reports, &report);
     return;
@@ -223,7 +241,7 @@ void renderEntry(const Request &request) {
   }
 
   markerRead = 0;
-  markerWrite = 1;
+  markerWrite = idleFreeze ? 0 : 1;
   markers[0] = {0, uint16_t((request.bank << 8) | (request.item + 1))};
   const Entry initial = bankEntry(request);
   submittedBytes = initial.bytes ? initial.count : 1;
@@ -242,8 +260,10 @@ void renderEntry(const Request &request) {
   sj_trace trace[BlockSamples];
   bool started = false;
   bool more = true;
+  bool engineMore = !idleFreeze;
+  bool idleLabelSent = false;
   const bool queued = request.mode == PlaybackMode::Queue;
-  const uint ahead = queued ? QueueAheadSamples : RingSize;
+  const uint ahead = QueueAheadSamples;
   while (more && !cancelled(request)) {
     if (write - readIndex.load(std::memory_order_acquire) > ahead - BlockSamples) {
       tight_loop_contents();
@@ -253,7 +273,22 @@ void renderEntry(const Request &request) {
     if (queued) {
       appendQueued(request.epoch);
     }
-    more = sj_render_tagged(chip, samples, trace, BlockSamples);
+    if(queued && sj_buffered(chip)>0)engineMore=true;
+    const uint32_t perf = performance.load(std::memory_order_relaxed);
+    const uint16_t pitchScale = perf >> 16, rateScale = perf & 65535;
+    const uint32_t fx = effectControl.load(std::memory_order_relaxed);
+    effects.configure(Fx(fx >> 16), fx & 65535);
+    const bool holding = errorControl.load(std::memory_order_acquire) && freeze.available();
+    frozen.store(holding, std::memory_order_relaxed);
+    const bool rendered = engineMore && !holding;
+    if (rendered) {
+      sj_set_performance(chip, pitchScale, rateScale);
+      engineMore = sj_render_tagged(chip, samples, trace, BlockSamples);
+    } else {
+      for (uint i=0;i<BlockSamples;++i) { samples[i]=0;trace[i]={0,0}; }
+    }
+    if (!holding) freeze.release();
+    synthBuffered.store(sj_buffered(chip), std::memory_order_relaxed);
     for (uint i = 0; i < BlockSamples; ++i) {
       const uint at = (write + i) & RingMask;
       labelStarts[at] = 0;
@@ -262,9 +297,18 @@ void renderEntry(const Request &request) {
           trace[i].byte_offset >= markers[markerRead & 63].offset) {
         labelStarts[at] = markers[markerRead++ & 63].label;
       }
-      const float sample = constrain(samples[i], -1.0f, 1.0f);
-      duties[(write + i) & RingMask] = uint16_t((sample + 1.0f) * (pwmPeriod * 0.5f));
+      int16_t raw = int16_t(constrain(samples[i], -1.0f, 1.0f) * 32767.0f);
+      if (holding) {
+        raw = freeze.sample(speedControl.load(std::memory_order_relaxed),pitchScale,articulation[at]);
+        if (idleFreeze && !idleLabelSent) {
+          labelStarts[at] = uint16_t((FreezeBank<<8)|1);idleLabelSent=true;
+        }
+      } else if (rendered) freeze.remember(raw,trace[i].code);
+      const int32_t output = effects.process(raw);
+      duties[at] = uint16_t((uint32_t(output+32768)*pwmPeriod)>>16);
     }
+    voiceBusy.store(engineMore || holding,std::memory_order_release);
+    more = engineMore || holding || effects.ringing();
     const uint32_t elapsedUs = micros() - startUs;
     ++report.blocks;
     report.totalUs += elapsedUs;
@@ -287,6 +331,10 @@ void renderEntry(const Request &request) {
     tight_loop_contents();
   }
 
+  voiceBusy.store(false,std::memory_order_release);
+  frozen.store(false,std::memory_order_relaxed);
+  synthBuffered.store(0,std::memory_order_relaxed);
+  if(cancelled(request)) freeze.clear();
   report.event = cancelled(request) ? Event::Cut : Event::Done;
   report.underrunEvents = underrunEvents.load(std::memory_order_relaxed);
   report.underrunSamples = underrunSamples.load(std::memory_order_relaxed);
@@ -363,6 +411,7 @@ void setupAudio() {
   pwm_set_irq_enabled(audioSlice, true);
   irq_set_enabled(PWM_IRQ_WRAP, true);
   pwm_set_enabled(audioSlice, true);
+  effects.begin();
   audioReady.store(true, std::memory_order_release);
 }
 
@@ -374,20 +423,35 @@ void setup1() {
 }
 
 void loop1() {
+  static bool idleHoldConsumed=false;
+  if(!errorControl.load(std::memory_order_relaxed))idleHoldConsumed=false;
   Request request;
-  queue_peek_blocking(&requests, &request);
-  // Publish busy before the request stops being visible in the queue.
-  requestActive.store(true, std::memory_order_release);
-  queue_try_remove(&requests, &request);
-  if (!cancelled(request)) {
-    renderEntry(request);
+  if(!queue_try_peek(&requests,&request)) {
+    if(!idleHoldConsumed && errorControl.load(std::memory_order_relaxed) && freeze.available()) {
+      request={gateEpoch.load(std::memory_order_relaxed),FreezeBank,0,PlaybackMode::Speech};
+      voiceBusy.store(true,std::memory_order_release);
+      requestActive.store(true,std::memory_order_release);
+      renderEntry(request);
+      voiceBusy.store(false,std::memory_order_release);
+      requestActive.store(false,std::memory_order_release);idleHoldConsumed=true;
+    } else tight_loop_contents();
+    return;
   }
-  requestActive.store(false, std::memory_order_release);
+  voiceBusy.store(true,std::memory_order_release);
+  requestActive.store(true,std::memory_order_release);
+  queue_try_remove(&requests,&request);
+  if(!cancelled(request))renderEntry(request);
+  if(errorControl.load(std::memory_order_relaxed))idleHoldConsumed=true;
+  voiceBusy.store(false,std::memory_order_release);
+  requestActive.store(false,std::memory_order_release);
 }
 
 void triggerAudio(uint8_t bank, uint8_t item, PlaybackMode mode) {
-  if (mode == PlaybackMode::Speech && audioBusy()) {
-    return;
+  if (mode == PlaybackMode::Speech) {
+    if(voiceBusy.load(std::memory_order_acquire) || playedCode.load(std::memory_order_relaxed) ||
+       !queue_is_empty(&requests))return;
+    // A delay/reverb tail must not lock out the next spoken note.
+    if(requestActive.load(std::memory_order_acquire))stopAudio();
   }
   const Request request{gateEpoch.load(std::memory_order_relaxed), bank, item, mode};
   if (!queue_try_add(&requests, &request)) {
@@ -411,81 +475,101 @@ bool audioBusy() {
   return !queue_is_empty(&requests) || requestActive.load(std::memory_order_acquire);
 }
 
+bool audioFrozen(){return frozen.load(std::memory_order_relaxed);}
+uint8_t nativeBuffered(){return synthBuffered.load(std::memory_order_relaxed);}
+void setPanelControls(const PanelControls &controls,bool announce) {
+#ifdef TALKO_DIAGNOSTICS
+  const PanelControls &active = injected ? injectedControls : controls;
+#else
+  const PanelControls &active = controls;
+#endif
+  static uint16_t oldPitch=65535,oldSpeed=65535,pitchScale=256,rateScale=256;
+  if(active.pitch!=oldPitch){oldPitch=active.pitch;pitchScale=Panel::scale(active.pitch);}
+  if(active.speed!=oldSpeed){oldSpeed=active.speed;rateScale=Panel::scale(active.speed);}
+  static uint32_t lastPanelAt=0;
+  if(panelMonitor && millis()-lastPanelAt>=100){panelPending=true;lastPanelAt=millis();}
+  panelSnapshot=controls;panelPending|=announce;
+  performance.store((uint32_t(pitchScale)<<16)|rateScale,std::memory_order_relaxed);
+  speedControl.store(active.speed,std::memory_order_relaxed);
+  effectControl.store((uint32_t(active.effect)<<16)|active.fx,std::memory_order_relaxed);
+  errorControl.store(active.error,std::memory_order_release);
+}
+
 // Explicit SpeakJet -> SAM mnemonic adapter; never transmit SpeakJet codes as SAM IDs.
 const char *mouthCode(uint8_t code) {
   static const char *const map[] = {
-    "IY", // 128 ENVR
-    "IH", // 129 ENVF
-    "EY", // 130 LPFFC
-    "EH", // 131 LPFQ
-    "AE", // 132 ATTACK
-    "AX", // 133 RELEASE
-    "UH", // 134 FXATT
-    "AA", // 135 FXREL
-    "AA", // 136 FLOOR
-    "OW", // 137 DIST2
-    "UH", // 138 DIST3
-    "UW", // 139 JITTER
-    "M", // 140 CLIP
-    "N", // 141 QUANT
-    "N", // 142 DECAY
-    "NX", // 143 TRANS
-    "NX", // 144 CLOSURE
-    "L", // 145 GATE
-    "L", // 146 OVERLAP
-    "W", // 147 OVERLAPV
-    "R", // 148 SPEEDA
-    "IY", // 149 SPEEDB
-    "EH", // 150 FXSPEEDA
-    "ER", // 151 FXSPEEDB
-    "ER", // 152 FAST
-    "OW", // 153 SLOW
-    "EY", // 154 COPY
-    "EY", // 155 COPYCL
-    "OY", // 156 BENDHZ
-    "AW", // 157 P0
-    "AY", // 158 P1
-    "IY", // 159 P2
-    "IY", // 160 P3
-    "AX", // 161 P4
-    "IH", // 162 P5
-    "AW", // 163 P6
-    "OW", // 164 S
-    "J", // 165 T
-    "V", // 166 IY
-    "Z", // 167 IH
-    "ZH", // 168 EY
-    "DH", // 169 EH
-    "B", // 170 AY
-    "B", // 171 AX
-    "B", // 172 UX
-    "B", // 173 OH
-    "D", // 174 AW
-    "D", // 175 OW
-    "D", // 176 UH
-    "D", // 177 UW
-    "G", // 178 MM
-    "G", // 179 NE
-    "G", // 180 NO
-    "G", // 181 NGE
-    "CH", // 182 NGO
-    "/H", // 183 LE
-    "/H", // 184 LO
-    "WH", // 185 WW
-    "F", // 186 RR
-    "S", // 187 IYRR
-    "S", // 188 EYRR
-    "SH", // 189 AXRR
-    "TH", // 190 AWRR
-    "T", // 191 OWRR
-    "T", // 192 EYIY
-    "S", // 193 OHIY
-    "K", // 194 OWIY
-    "K", // 195 OHIH
-    "K", // 196 IYEH
-    "K", // 197 EHLL
-    "P", // 198 IYUW
-    "P", // 199 AXUW
+    "IY", // 128 IY
+    "IH", // 129 IH
+    "EY", // 130 EY
+    "EH", // 131 EH
+    "AE", // 132 AY
+    "AX", // 133 AX
+    "UH", // 134 UX
+    "AA", // 135 OH
+    "AA", // 136 AW
+    "OW", // 137 OW
+    "UH", // 138 UH
+    "UW", // 139 UW
+    "M", // 140 MM
+    "N", // 141 NE
+    "N", // 142 NO
+    "NX", // 143 NGE
+    "NX", // 144 NGO
+    "L", // 145 LE
+    "L", // 146 LO
+    "W", // 147 WW
+    "R", // 148 RR
+    "IY", // 149 IYRR
+    "EH", // 150 EYRR
+    "ER", // 151 AXRR
+    "ER", // 152 AWRR
+    "OW", // 153 OWRR
+    "EY", // 154 EYIY
+    "EY", // 155 OHIY
+    "OY", // 156 OWIY
+    "AW", // 157 OHIH
+    "AY", // 158 IYEH
+    "IY", // 159 EHLL
+    "IY", // 160 IYUW
+    "AX", // 161 AXUW
+    "IH", // 162 IHWW
+    "AW", // 163 AYWW
+    "OW", // 164 OWWW
+    "J", // 165 JH
+    "V", // 166 VV
+    "Z", // 167 ZZ
+    "ZH", // 168 ZH
+    "DH", // 169 DH
+    "B", // 170 BE
+    "B", // 171 BO
+    "B", // 172 EB
+    "B", // 173 OB
+    "D", // 174 DE
+    "D", // 175 DO
+    "D", // 176 ED
+    "D", // 177 OD
+    "G", // 178 GE
+    "G", // 179 GO
+    "G", // 180 EG
+    "G", // 181 OG
+    "CH", // 182 CH
+    "/H", // 183 HE
+    "/H", // 184 HO
+    "WH", // 185 WH
+    "F", // 186 FF
+    "S", // 187 SE
+    "S", // 188 SO
+    "SH", // 189 SH
+    "TH", // 190 TH
+    "T", // 191 TT
+    "T", // 192 TU
+    "S", // 193 TS
+    "K", // 194 KE
+    "K", // 195 KO
+    "K", // 196 EK
+    "K", // 197 OK
+    "P", // 198 PE
+    "P", // 199 PO
   };
   static_assert(sizeof(map) / sizeof(map[0]) == 72);
   return code >= 128 && code <= 199 ? map[code - 128] : "-";
@@ -501,6 +585,7 @@ void serviceConsole() {
   static bool haveLast = false, requestLast = false;
   PlaybackEvent playback;
   static bool mouthEnabled = false;
+  static bool statsEnabled = false;
   static uint8_t lastMouth = 255;
   static uint8_t requestOffset = 0;
   static char command[288];
@@ -537,8 +622,23 @@ void serviceConsole() {
       command[commandLength] = 0;
       if (!commandOverflow) {
         unsigned bank, item;
+#ifdef TALKO_DIAGNOSTICS
+        unsigned tp,ts,tf,te,terr;
+        if(!strcmp(command,"TEST OFF")){injected=false;panelPending=true;}
+        else if(sscanf(command,"TEST %u %u %u %u %u",&tp,&ts,&tf,&te,&terr)==5 &&
+                tp<=4095 && ts<=4095 && tf<=4095 && te<unsigned(Fx::Count) && terr<=1){
+          injectedControls=panelSnapshot;injectedControls.pitch=tp;injectedControls.speed=ts;
+          injectedControls.fx=tf;injectedControls.effect=Fx(te);injectedControls.error=terr;
+          injected=true;panelPending=true;
+        }else
+#endif
         if (!strcmp(command, "CUT")) stopAudio();
-        else if (!strcmp(command, "STATUS")) connected = false;
+        else if (!strcmp(command, "STATUS")) {connected = false;panelPending=true;}
+        else if (!strcmp(command,"PANEL")) panelPending=true;
+        else if (!strcmp(command,"MONITOR ON")) panelMonitor=true;
+        else if (!strcmp(command,"MONITOR OFF")) panelMonitor=false;
+        else if (!strcmp(command,"STATS ON")) statsEnabled=true;
+        else if (!strcmp(command,"STATS OFF")) statsEnabled=false;
         else if (!strcmp(command, "LAST")) requestLast = true;
         else if ((sscanf(command, "PLAY %u %u", &bank, &item) == 2 ||
                   sscanf(command, "QUEUE %u %u", &bank, &item) == 2) &&
@@ -577,19 +677,32 @@ void serviceConsole() {
     int count;
     if (!connected) {
       count = snprintf(line, sizeof(line),
-                       "Talko_SpeakJet %u.%u mode=native engine=%s sample_hz=%u "
+                       "Talko_SpeakJet %s build=%s engine=%s sample_hz=%u "
                        "block_samples=%u budget_us=%u prefill_samples=%u\r\n",
-                       unsigned(VersionMajor), unsigned(VersionMinor), SJ_VERSION,
+                       FirmwareVersion,
+#ifdef TALKO_DIAGNOSTICS
+                       "diagnostic",
+#else
+                       "normal",
+#endif
+                       SJ_VERSION,
                        unsigned(SJ_SAMPLE_RATE), BlockSamples, blockBudgetUs,
                        PrefillSamples);
       connected = true;
+    } else if (panelPending) {
+      panelPending=false;
+      count=snprintf(line,sizeof(line),"PANEL mode=%s pins=%u%u pitch=%u speed=%u fx=%u effect=%u error=%u sound=%u buffered=%u frozen=%u\r\n",
+        Panel::modeName(panelSnapshot.mode),unsigned(panelSnapshot.modeA),unsigned(panelSnapshot.modeB),
+        unsigned(panelSnapshot.pitch),unsigned(panelSnapshot.speed),unsigned(panelSnapshot.fx),
+        unsigned(panelSnapshot.effect),unsigned(panelSnapshot.error),unsigned(panelSnapshot.sound),
+        unsigned(nativeBuffered()),unsigned(audioFrozen()));
     } else if (queue_try_remove(&playbackEvents, &playback)) {
       if (!playback.label) count = snprintf(line, sizeof(line), "STOP\r\n");
       else {
         const uint bank = playback.label >> 8, item = (playback.label & 255) - 1;
         const Request label{0, uint8_t(bank), uint8_t(item), PlaybackMode::Speech};
         count = snprintf(line, sizeof(line), "%s\r\n",
-                         bank > StartupBank ? "RAW" : bankEntry(label).label);
+                         bank == FreezeBank ? "ERROR" : bank > StartupBank ? "RAW" : bankEntry(label).label);
       }
     } else if (mouthEnabled && playedCode.load(std::memory_order_relaxed) != lastMouth) {
       lastMouth = playedCode.load(std::memory_order_relaxed);
@@ -601,6 +714,7 @@ void serviceConsole() {
       if (report.event == Event::Done || report.event == Event::Cut) {
         lastCompleted = report; haveLast = true;
       }
+      if(!statsEnabled)return;
       count = formatReport(line, sizeof(line), report);
     } else {
       return;

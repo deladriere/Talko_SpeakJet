@@ -1,0 +1,40 @@
+{
+  "date": "2026-11-13",
+  "target": "RP2040 B2 133 MHz, serial E6647C74032B9C24",
+  "normal_uf2_sha256": "44364c7b07c710a045e2c4a7b28e74e40de9c18c1bd95eced292e370a374c3be",
+  "diagnostic_uf2_sha256": "f52cb2da22de0a762cedaed0dc8e82141be149ee02e876419d2e56757c73daca",
+  "block_samples": 64,
+  "deadline_us": 7974,
+  "normal_all_banks": {
+    "streams": 262,
+    "peak_us": 8206,
+    "late_blocks": 2,
+    "underrun_samples": 0
+  },
+  "normal_quick": {
+    "streams": 18,
+    "peak_us": 7578,
+    "late_blocks": 0,
+    "underrun_samples": 0
+  },
+  "controlled_diagnostic": {
+    "streams": 16,
+    "peak_us": 7825,
+    "late_blocks": 0,
+    "underrun_samples": 0
+  },
+  "tail_diagnostic": {
+    "streams": 2,
+    "peak_us": 6184,
+    "late_blocks": 0,
+    "underrun_samples": 0
+  },
+  "before_panel_interval_quick": {
+    "streams": 18,
+    "peak_us": 9707,
+    "late_blocks": 587,
+    "underrun_samples": 1124
+  },
+  "device_left_installed": "Talko_SpeakJet 0.9.1 normal",
+  "final_timing_and_panel_monitoring": "OFF"
+}

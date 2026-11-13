@@ -19,7 +19,7 @@ inline void prepareLed() {
 }
 
 inline void showVersion(uint8_t major, uint8_t minor, void (*show)(uint8_t),
-                        void (*say)(uint8_t) = nullptr, bool (*busy)() = nullptr) {
+                        void (*say)(uint8_t) = nullptr, bool (*busy)() = nullptr, int patch = -1) {
   pio_sm_claim(pio0, LedStateMachine);
   const uint offset = pio_add_program(pio0, &ws2812_program);
   ws2812_program_init(pio0, LedStateMachine, offset, LedPin, 800000, false);
@@ -48,6 +48,12 @@ inline void showVersion(uint8_t major, uint8_t minor, void (*show)(uint8_t),
   part(Digits[major], major, 100u << 8, major);
   part(Dot, Point, 255, 1);
   part(Digits[minor], minor, 100u << 16, minor);
+  if(patch>=0){part(Dot,Point,255,1);part(Digits[patch],patch,100u<<16,patch);}
+}
+
+inline void setLed(uint32_t grb) {
+  static uint32_t last=~0u;
+  if(last!=grb && !pio_sm_is_tx_fifo_full(pio0,LedStateMachine)){pio_sm_put(pio0,LedStateMachine,grb<<8);last=grb;}
 }
 
 } // namespace TalkoStartup

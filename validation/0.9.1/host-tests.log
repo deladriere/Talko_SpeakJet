@@ -1,0 +1,6 @@
+251 bank selections, tagged/plain sample parity, 24 modifier/Speed streams and FIFO bounds OK
+Live pairs accepted=5757 safely separate=399; late arrival and reset OK
+ok
+Live pitch independent of duration; quarter/four-times rate, slow native joins and half-full flow control OK
+All FX dry/switch-tail behavior, ERROR loop/rate, pot scales and switch decoding OK
+Actual panel loop: three switch positions, gate cuts, queued selections, all ADCs, FX page, ERROR and bank reversal OK

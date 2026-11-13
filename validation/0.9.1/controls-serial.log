@@ -1,0 +1,155 @@
+Talko_SpeakJet 0.9.1 build=diagnostic engine=0.4.3 sample_hz=8026 block_samples=64 budget_us=7974 prefill_samples=128
+Talko_SpeakJet 0.9.1 build=diagnostic engine=0.4.3 sample_hz=8026 block_samples=64 budget_us=7974 prefill_samples=128
+PANEL mode=queue pins=10 pitch=1556 speed=1165 fx=21 effect=3 error=0 sound=1142 buffered=0 frozen=0
+ZERO
+STOP
+POINT
+STOP
+NINE
+STOP
+POINT
+STOP
+ONE
+STOP
+PLAY bank=9 item=1 label=ZERO mode=speech
+RESULT bank=9 item=1 label=ZERO status=done blocks=70 avg_us=5363 peak_us=7396 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=11 label=POINT mode=speech
+RESULT bank=9 item=11 label=POINT status=done blocks=63 avg_us=5439 peak_us=7453 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=10 label=NINE mode=speech
+RESULT bank=9 item=10 label=NINE status=done blocks=53 avg_us=5683 peak_us=7411 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=11 label=POINT mode=speech
+RESULT bank=9 item=11 label=POINT status=done blocks=63 avg_us=5434 peak_us=7420 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=9 item=2 label=ONE mode=speech
+RESULT bank=9 item=2 label=ONE status=done blocks=42 avg_us=5492 peak_us=7373 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1791 speed=1355 fx=21 effect=3 error=0 sound=1317 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=158 avg_us=5321 peak_us=6159 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1789 speed=1356 fx=21 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=158 avg_us=5324 peak_us=6067 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1789 speed=1356 fx=22 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=158 avg_us=5334 peak_us=6060 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1787 speed=1355 fx=23 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=328 avg_us=5331 peak_us=6084 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1789 speed=1357 fx=21 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=83 avg_us=5286 peak_us=6065 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1790 speed=1357 fx=23 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=22 avg_us=5071 peak_us=6018 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1788 speed=1356 fx=24 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5735 peak_us=7736 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1791 speed=1356 fx=23 effect=3 error=0 sound=1317 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5774 peak_us=7772 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1791 speed=1355 fx=22 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=663 avg_us=3715 peak_us=7825 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1789 speed=1357 fx=22 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=663 avg_us=3695 peak_us=7799 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1788 speed=1356 fx=20 effect=3 error=0 sound=1321 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5788 peak_us=7788 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1790 speed=1357 fx=22 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5777 peak_us=7780 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1789 speed=1355 fx=22 effect=3 error=0 sound=1319 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5769 peak_us=7786 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1790 speed=1357 fx=23 effect=3 error=0 sound=1318 buffered=0 frozen=0
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=413 avg_us=5809 peak_us=7803 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PANEL mode=queue pins=10 pitch=1788 speed=1358 fx=22 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=1 item=1 label=IY code=128 mode=queue
+IY
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=2
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=3
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=4
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=5
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=6
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=6
+STOP
+EY
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=7
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=8
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=9
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=10
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=11
+STOP
+AY
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=11
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=12
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=13
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=14
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=15
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=16
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=17
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=18
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=19
+STOP
+OW
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=19
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=20
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=21
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=22
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=23
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=24
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=25
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=26
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=27
+STOP
+IY
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=27
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=28
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=29
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=30
+QUEUE bank=1 item=5 label=AY code=132 pending=0 buffer_bytes=31
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=32
+STOP
+EY
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=32
+QUEUE bank=1 item=3 label=EY code=130 pending=0 buffer_bytes=33
+PANEL mode=queue pins=10 pitch=1788 speed=1355 fx=21 effect=3 error=0 sound=1320 buffered=33 frozen=0
+STOP
+RESULT bank=1 item=1 label=IY status=cut blocks=320 avg_us=5430 peak_us=6301 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=128 mode=queue
+PANEL mode=queue pins=10 pitch=1787 speed=1354 fx=22 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+PANEL mode=queue pins=10 pitch=1789 speed=1353 fx=21 effect=3 error=0 sound=1320 buffered=1 frozen=0
+PANEL mode=queue pins=10 pitch=1790 speed=1356 fx=22 effect=3 error=0 sound=1320 buffered=1 frozen=1
+PANEL mode=queue pins=10 pitch=1788 speed=1355 fx=21 effect=3 error=0 sound=1322 buffered=1 frozen=1
+PANEL mode=queue pins=10 pitch=1789 speed=1356 fx=22 effect=3 error=0 sound=1319 buffered=1 frozen=1
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=293 avg_us=3654 peak_us=6113 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech

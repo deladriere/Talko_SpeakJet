@@ -2,13 +2,13 @@ from pathlib import Path
 import serial,serial.tools.list_ports,time,re,json,sys,argparse
 parser=argparse.ArgumentParser()
 parser.add_argument("--serial-id",required=True)
-parser.add_argument("--output",type=Path,default=Path("validation/0.9"))
+parser.add_argument("--output",type=Path,default=Path("validation/0.9.1"))
 parser.add_argument("--quick",action="store_true")
 args=parser.parse_args()
 out=args.output;out.mkdir(parents=True,exist_ok=True)
 ports=[p for p in serial.tools.list_ports.comports() if p.serial_number==args.serial_id]
 assert len(ports)==1
-assert ports[0].product=='Talko_SpeakJet 0.9',ports[0].product
+assert ports[0].product=='Talko_SpeakJet 0.9.1',ports[0].product
 s=serial.Serial(ports[0].device,115200,timeout=.1)
 log=[];results=[]
 def read_until(predicate,timeout=12):
@@ -27,10 +27,13 @@ def run(command,timeout=12):
     s.write((command+'\n').encode());s.flush()
     line=read_until(lambda l:l.startswith('RESULT '),timeout)
     record=dict(re.findall(r'(\w+)=([^ ]+)',line));record['command']=command
+    if command.startswith('PLAY '):
+        _,bank,item=command.split();assert record['bank']==bank and record['item']==item
+    elif command.startswith('RAW '):assert record['bank']=='10'
     results.append(record)
     return record
 try:
-    s.write(b'STATUS\n')
+    s.write(b'STATS ON\nSTATUS\n')
     banner=read_until(lambda l:l.startswith('Talko_SpeakJet'))
     assert 'engine=0.4.3' in banner
     if '--quick' not in sys.argv:
@@ -51,7 +54,9 @@ try:
     q=read_until(lambda l:l.startswith('RESULT '),12)
     record=dict(re.findall(r'(\w+)=([^ ]+)',q));record['command']='12 live vowel gates at 25 Hz';results.append(record)
     queue_log=log[before:]
-    print('Queue spoken labels',sum(l in ('IY','OW') for l in queue_log),flush=True)
+    labels=sum(l in ('IY','OW') for l in queue_log)
+    print('Queue spoken labels',labels,flush=True)
+    assert labels==12,labels
     # Cut invalidates both the playing stream and queued requests.
     s.write(b'QUEUE 0 6\n');time.sleep(.05);s.write(b'QUEUE 0 1\nCUT\n')
     cut=read_until(lambda l:l.startswith('RESULT ') and 'status=cut' in l)
@@ -62,11 +67,12 @@ try:
     assert any('SAM:' in l and 'SAM:-' not in l for l in log[-50:])
     # A closed serial host must not stall the audio core. LAST retains the result.
     s.write(b'RAW 21 60 132 141 179 137 4 187 8 187 128\n');s.flush();time.sleep(.03)
-    s.close();time.sleep(4)
+    s.close();time.sleep(20)
     s=serial.Serial(ports[0].device,115200,timeout=.1);s.write(b'LAST\n')
     closed=read_until(lambda l:l.startswith('RESULT '))
     record=dict(re.findall(r'(\w+)=([^ ]+)',closed));record['command']='serial closed during RAW';results.append(record)
 finally:
+    if s.is_open:s.write(b'STATS OFF\nMONITOR OFF\n')
     s.close()
     suffix='quick' if '--quick' in sys.argv else 'all-banks'
     (out/(suffix+'-serial.log')).write_text('\n'.join(log)+'\n')
@@ -76,3 +82,4 @@ if results:
     underruns=sum(int(r['underrun_samples']) for r in results)
     late=sum(int(r['late_blocks']) for r in results)
     print('Streams',len(results),'peak',peak['peak_us'],'command',peak['command'],'late blocks',late,'underrun samples',underruns,flush=True)
+    assert underruns==0,'Audio underruns occurred; see the saved serial log and results'

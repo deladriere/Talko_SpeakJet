@@ -106,6 +106,10 @@ bool sj_render(sj_chip *sj, float *buf, size_t n);
 typedef struct sj_trace { uint32_t byte_offset; uint8_t code; } sj_trace;
 bool sj_render_tagged(sj_chip *sj, float *buf, sj_trace *trace, size_t n);
 
+/* Live panel ratios in Q8 (256 = unity). Default after power-on is unity.
+ * Rate changes allophone timing independently of voiced pitch. Core 1 only. */
+void sj_set_performance(sj_chip *sj, uint16_t pitch_q8, uint16_t rate_q8);
+
 /* the mnemonic of an allophone (128 to 199) or sound effect (200 to 254),
  * e.g. "IY" or "M1". NULL for any other code */
 const char *sj_sound_name(uint8_t code);

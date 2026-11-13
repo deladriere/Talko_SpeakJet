@@ -1,19 +1,20 @@
-# Talko_SpeakJet 0.9
+# Talko_SpeakJet 0.9.1
 
 SpeakJet firmware for the **Talko 2 (RP2040)**. It brings the Emy-style
 banks of vowels, allophones and effects to Talko, along with a bank of spoken
 digits. In Queue mode, closely spaced triggers can blend phonemes into a
 continuous voice.
 
-At startup, SpeakJet says “zero point nine” as the front display shows
+At startup, SpeakJet says “zero point nine point one” as the front display shows
 `0`, the dot, then `9`. The rear LED flashes blue once and green nine
-times. Red flashes count the major version when it is above zero.
+times. A second dot/blue separator and one green flash announce the patch `1`.
+Red flashes count the major version when it is above zero.
 
 ## Install and play
 
 1. Connect Talko with a USB data cable. Hold **BOOTSEL**, press and release
    **RESET**, then release **BOOTSEL** when the `RPI-RP2` drive appears.
-2. Copy [Talko_SpeakJet-0.9.uf2](Talko_SpeakJet-0.9.uf2) to that drive.
+2. Copy [Talko_SpeakJet-0.9.1.uf2](Talko_SpeakJet-0.9.1.uf2) to that drive.
    Talko restarts automatically.
 3. Move the switch **left**, turn the encoder to bank **0**, and turn
    **SOUND** fully counterclockwise. Press **SPEAK** to hear **HELLO**.
@@ -25,18 +26,34 @@ times. Red flashes count the major version when it is above zero.
 | Encoder turn | Select a bank. The display shows its number. |
 | SOUND knob or CV | Select an entry within the current bank. |
 | SPEAK button or GATE input | Trigger the selected entry. |
-| SPEED, PITCH, FX and ERROR | Voice settings are fixed in 0.9. Select built-in effects with SOUND in bank 6. |
+| PITCH | Live vocal pitch: lower counterclockwise, higher clockwise; noon is the native default. Unvoiced hisses and fixed tones behave like the chip and have no vocal pitch. |
+| SPEED | Live allophone rate, approximately one quarter to four times normal; noon is normal. It changes timing independently of pitch. |
+| FX | Amount of the selected output effect. Fully counterclockwise is dry, with a small dead zone. Default effect: Delay. |
+| Encoder press | Switch between bank and FX pages. The dot is steady on the FX page and off on the bank page. Turn the encoder to select the bank/effect on the current page. |
+| ERROR | Hold to repeat a short recent sound loop. PITCH changes loop playback rate; SPEED changes loop length; FX remains live. Release to resume the paused speech, or finish an idle hold. |
 
 | Switch | Mode | Action |
 |---|---|---|
 | Left | **Speech** | A trigger plays the selection once to completion. Speech takes priority and additional triggers during playback are ignored. |
 | Middle | **Gate** | A rising gate starts playback. A falling gate cuts playback and clears waiting sounds. |
-| Right | **Queue** | Each rising edge adds the current SOUND selection in order. If the next phoneme arrives before the current one starts fading, the two can blend. |
+| Right | **Queue** | Each rising edge feeds the current selection into the same native 64-byte SpeakJet MSA input FIFO while synthesis continues. Adjacent allophones use the engine's context-dependent transitions. Lower SPEED and clock phonemes into the buffer to hear the blending. |
 
 For a first Queue patch, select **bank 1**, set SOUND fully counterclockwise
-for **IY**, and send a short burst of gates at about **15 Hz**. Move SOUND between gates to
+for **IY**, turn **FX fully left** and **SPEED left**, then send gates at about **10–15 Hz**. Move SOUND between gates to
 queue different vowels. Stop the clock to hear the queue
-drain. With a sequencer, let the SOUND CV settle before each gate.
+drain. The rear LED turns green when the native buffer is more than half full,
+as in Emy. With a sequencer, let the SOUND CV settle before each gate.
+
+The switch briefly shows `S`, `G` or `q` when changed, then returns to the
+selected bank/FX page. In Gate mode, a falling gate cuts the stream and waiting
+selections. Speech mode lets the utterance complete and ignores retriggers
+while busy. Queue lets incoming allophones reach one ongoing synthesis stream;
+it does not restart the emulator for every allophone.
+
+FX choices are Off, Ring modulation, Reverb, Delay, Bit crush, Drive, Low-pass
+and High-pass. Start dry, choose an effect on the FX page, then raise FX. Delay
+and reverb can continue for up to two seconds after the voice. The ERROR display
+uses the stock irregular brightness flicker while preserving the FX-page dot.
 
 ## Banks
 
@@ -62,16 +79,23 @@ selects **WOW** (SpeakJet **M2**).
 ## USB serial
 
 Open PlatformIO Monitor or another serial terminal at **115200 baud** before
-playing. On macOS, look for a `/dev/cu.usbmodem…` port. The USB device name is **Talko_SpeakJet 0.9** (manufacturer Polaxis).
-The connection banner shows both firmware and engine versions.
+playing. On macOS, look for a `/dev/cu.usbmodem…` port. The USB device name is **Talko_SpeakJet 0.9.1** (manufacturer Polaxis).
+The connection banner shows firmware/engine versions and `build=normal`.
+Normal operation sends readable speech labels and STOP; timing and repeated
+panel snapshots are enabled only by explicit serial commands.
 
 | Serial line | Meaning |
 |---|---|
 | Plain label / `STOP` | The selection reaches playback / the stream finishes or is cut. Repeated Queue selections repeat their labels. |
+| `PANEL` | Current mode, switch pins and physical ADC/button readings; sent on panel context changes or on request. |
 | `PLAY` | The stream starts with this bank, item, and label. Items are numbered from 1. Native entries include `code`. Effects also include the upstream mnemonic as `sj`. |
 | `QUEUE` | A selection entered the current stream. `pending` counts selections waiting to enter the synth. `buffer_bytes` counts bytes in the synth buffer, including the active command. |
 | `DROP` | A new trigger arrived while all 16 pending slots were occupied. |
 | `RESULT` | Timing and underruns for the whole stream. `status=done` marks completion and `status=cut` marks a gate cutoff. |
+
+Use `STATS ON` to enable PLAY/QUEUE/RESULT diagnostics and `STATS OFF` to
+disable them (the default). `MONITOR ON` enables ten panel snapshots per second;
+`MONITOR OFF` returns to normal.
 
 The RP2040 renders 64 samples per block at **8,026 Hz**, giving each block
 a **7,974 µs** playback budget on the tested clock. The firmware computes
@@ -105,19 +129,28 @@ from Polaxis Emy's SpeakJet firmware.
 
 ## Verification
 
-Talko_SpeakJet 0.9 builds for RP2040 and has been flashed and readback-verified
-on the connected Talko. Host checks cover all 251 selections, allophone-pair
-live joining, later arrivals, resets, FIFO bounds and Speed/modifier streams.
-The complete hardware bank scan and live Queue/serial checks produced zero
-underrun samples. Some transient blocks exceeded the 7,974 µs deadline;
-buffering covered those peaks in these tests. These are measured limits,
-not a guarantee for every sequence.
+Talko_SpeakJet 0.9.1 builds for RP2040. The normal image has been flashed,
+readback-verified and left installed. The user confirmed PITCH, FX, ERROR and
+all switch modes working on the instrument. Host tests exercise the actual
+panel loop with simulated GPIO/ADC input, native slow phoneme joining, pitch
+independent of duration, FX dry/switch behavior and ERROR loop playback.
 
-See [the validation record](validation/0.9/README.md) for exact results,
-recordings, source versions and remaining manual checks. Run the host suite
-with `sh tests/run_host.sh`, or `SANITIZE=1 sh tests/run_host.sh` for address
-and undefined-behavior checks. The engine compiles with double-promotion
-warnings treated as errors in this suite.
+The final normal-image scan completed **262 streams**, including every bank
+selection, transitions, live Queue and serial-disconnected playback, with
+**zero underruns**. Two blocks exceeded the 7,974 µs deadline; the maximum was
+8,206 µs and buffering covered both. The separate diagnostic build measured
+pitch, rate, all eight FX choices, native FIFO filling and ERROR with zero late
+blocks or underruns. A 1 ms panel/USB update interval prevents the CPU contention
+found in the first control candidate; gate and encoder interrupts still capture
+edges between updates.
+
+See [the 0.9.1 validation record](validation/0.9.1/README.md) for exact images,
+measurements, the earlier failing tests and limits. Run
+`SANITIZE=1 sh tests/run_host.sh` for the full host suite with
+address/undefined-behavior checks.
+
+The [0.9 validation archive](validation/0.9/README.md) documents the earlier
+engine-only prototype; it did not validate physical panel controls.
 
 ### Historical checks
 
@@ -139,7 +172,7 @@ sweep optimization introduced in 0.5.
 
 ## Talko-specific implementation: preserve during upstream updates
 
-The Talko firmware version (currently **Talko_SpeakJet 0.9**) is separate
+The Talko firmware version (currently **Talko_SpeakJet 0.9.1**) is separate
 from the embedded SpeakJet engine version (**0.4.3**). This is a maintained
 RP2040 port, not an unmodified copy of the desktop emulator.
 
@@ -150,20 +183,24 @@ RP2040 port, not an unmodified copy of the desktop emulator.
 | Audio rate and output stage | `SJ_SAMPLE_RATE=8026`, matching the emulator's measured native chip tick. The analogue output model is advanced once per held sample with cached pole coefficients. Do not restore upstream's 48 kHz renderer accidentally. |
 | Expensive calculations | Master volume gain is cached until Volume changes. Exact coefficients of stationary noise bands are cached. C8/C9 noise-filter sweeps are prepared once in `sj_new()` and survive `sj_power_on()` resets. |
 | RAM placement | `SJ_TALKO_RP2040` places the renderer and sine table in time-critical RAM sections. Keep the library flags in `library.json`. |
-| Core ownership | Core 1 owns the emulator, FIFO writes and rendering. Core 0 handles the panel, USB and PWM interrupt. Never access one emulator concurrently from both cores. |
-| Audio buffering | 64-sample blocks; 1024-sample duty ring; 128-sample startup prefill. Queue mode limits rendering ahead to 256 samples so a new gate can still influence an upcoming join. |
+| Core ownership | Core 1 owns the emulator, FIFO writes and rendering. Core 0 handles the panel, USB and PWM interrupt. Keep its panel/USB loop at about 1 kHz: an unrestricted loop contends with the renderer for shared memory and caused underruns. Encoder/gate edges remain interrupt-driven. Never access one emulator concurrently from both cores. |
+| Audio buffering | 64-sample blocks; 1024-sample duty ring; 128-sample startup prefill. All modes limit rendering ahead to 192 samples (about 24 ms), keeping pitch, speed, FX and ERROR responsive. Native Queue flow control stops feeding at Buffer Half Full (>32 bytes). |
 | PWM output | GPIO 1 carries PWM at 12 carrier periods per audio sample. The interrupt only consumes prepared duties; synthesis stays outside interrupts. |
 | Live joining | `sj_join_pending()` revisits a phoneme's tail after appending live input between render blocks. A reusable scratch planner rebuilds the sound with the newly available context and accepts it only when the rendered past is unchanged. Late arrivals and explicit Repeat-command copies remain separate. This API is a Talko addition. |
 | Stream cancellation | Epoch-based gate cuts invalidate playing and waiting requests. The pending selection queue has 16 slots; a full queue reports `DROP`. |
 | Instrument identity | Nine Emy-style banks, the existing allophone/effect byte order, Emy effect labels and spoken digits, and the six bank-0 phrases. Preserve these byte streams during an engine-only update. |
-| Panel behavior | Settled quadrature inputs on GPIO 3/4, SOUND on ADC GPIO 26, inverted GATE/SPEAK on GPIO 2, mode switch on GPIO 14/15, display GPIO 5–12 at brightness 100. Speech/Gate/Queue retain their distinct retrigger and cutoff behavior. |
+| Panel behavior | Settled quadrature inputs on GPIO 3/4; SOUND/FX/SPEED/PITCH on ADC GPIO 26/27/28/29; ERROR on GPIO 0; encoder press on 13; inverted GATE/SPEAK on 2; switch 14/15; display 5–12 at brightness 100. Speech/Gate/Queue use distinct retrigger/cutoff policies. |
 | Startup | `talko_startup.h` and `ws2812.pio.h`: spoken version synchronized with the front display, rear RGB LED on GPIO 16, and bank-page decimal point off. |
+| Live performance | `sj_set_performance()` applies Q8 pitch/rate ratios. Rate advances allophone/frame timing; oscillator/output time remains native-rate. Preserve native command streams and transition planning. The interpolation reciprocal is cached, constant hot-loop divisions use reciprocals, and the phase wrap uses a fast bounded path. |
+| ERROR / FX | Core 1 runs fixed-point output FX and a recent-PCM freeze with phoneme tags. Hold pauses engine advancement while the ring continues; controls remain live. Dry FX invalidates old tails. |
 | Playback metadata | `sj_render_tagged()` carries the held sample's allophone and command-byte offset through the audio ring. Labels and optional mouth events follow playback, including Queue and cuts. The explicit adapter sends SAM mnemonics, never SpeakJet numeric IDs. |
 | Diagnostics | Nonblocking USB writes and per-stream mean/peak render times, late blocks and actual underrun counts. A late block alone does not prove an audible gap. |
 
 ### Source layout
 
-- `src/main.cpp`: encoder, switch, SOUND selection, display and trigger handling.
+- `src/main.cpp`: all panel inputs, debounced mode switch, bank/FX pages, ERROR flicker and display.
+- `src/panel_logic.h`: testable switch mapping, pot ratios, dry zone and selection bounds.
+- `src/dsp.h` / `dsp.cpp`: fixed-point FX and ERROR history loop, owned by core 1.
 - `src/audio.cpp` / `audio.h`: core ownership, ring buffer, PWM, stream modes,
   cancellation, startup speech, serial reports and Talko version.
 - `src/banks.h`: immutable selections, phrase bytes, digit dictionary and Emy labels.
@@ -202,20 +239,26 @@ RP2040 port, not an unmodified copy of the desktop emulator.
 
 ### Current limitations
 
-SPEED, PITCH, FX and ERROR are not implemented as panel controls in 0.9.
-Serial emits readable labels and `STOP`, plus optional playback phoneme poses. The SAM adapter uses representative poses for SpeakJet glides; it does not reconstruct their complete internal articulation. Audio is native-rate PWM, so it does not
-reproduce all high-frequency images of upstream's 48 kHz desktop output.
-The timing results in `validation/0.9/` cover the listed test streams; they do not prove every patch is underrun-free.
+PITCH affects voiced allophones and applicable pitch-driven effects; unvoiced
+sounds and fixed-frequency effects retain their native behavior. At very low
+pitch the voice becomes clicks, like the real chip. The Console adapter uses
+representative poses for glides rather than reconstructing their full internal
+articulation. Native-rate PWM does not reproduce every high-frequency image
+of upstream's 48 kHz desktop output. Zero measured underruns do not establish
+that every possible patch will meet its deadline.
 
 
-## Developer serial commands (0.9)
+## Developer serial commands (0.9.1)
 
 Commands end with a newline. Work is bounded and nonblocking on the panel
 core; playback still obeys the selected request mode.
 
 | Command | Action |
 |---|---|
-| `STATUS` | Report Talko and engine versions, block size and deadline. |
+| `STATUS` | Report firmware/build/engine, block size and deadline, followed by PANEL state. |
+| `PANEL` | Report mode, raw switch pins, physical pots, ERROR, FIFO occupancy and freeze state. |
+| `STATS ON` / `STATS OFF` | Enable/disable timing and input-buffer diagnostics. Default OFF. |
+| `MONITOR ON` / `MONITOR OFF` | Enable/disable repeated physical input snapshots. Default OFF. |
 | `PLAY 0 1` | Play bank 0, item 1 (HELLO), with Speech-mode busy behavior. Banks are zero-based; items are one-based. |
 | `QUEUE 1 10` | Append bank 1, item 10 (OW), using live Queue behavior. |
 | `RAW 141 179 137` | Play a test byte stream (NE GO OW), up to 64 decimal bytes, separated by spaces or commas. Accepted only while idle. These are SpeakJet command bytes, not text. |
@@ -233,7 +276,7 @@ For a repeatable device scan, install `pyserial`, close other serial clients,
 identify the Talko's USB serial number, and run:
 
 ```sh
-python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output validation/0.9
+python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output validation/0.9.1
 ```
 
 Add `--quick` for selected words/effects and the transition, Queue, cutoff,
@@ -259,3 +302,29 @@ count afterward.
   `4bba1baf69f9fd55c4a2023a88f77b87657e6361`), with the maintained native-rate
   RP2040 port, shared live transition planner, exact stationary-noise cache,
   playback metadata, serial diagnostics and bounded encoder clicks.
+
+
+## Normal and diagnostic builds
+
+`pio run` builds only the normal `pico` environment. It contains no test-input
+override command and performs no automatic benchmark. The release UF2 and USB
+identity are **Talko_SpeakJet 0.9.1**; its banner says `build=normal`.
+
+`pio run -e diagnostic` is a separately labelled developer build containing
+`TEST pitchADC speedADC fxADC effectIndex errorFlag` and `TEST OFF` for controlled
+measurements. It is not the release image. Physical input monitoring, STATS and
+normal playback commands are also available in the normal build. Always leave
+the normal image installed after diagnostic testing and verify the USB product
+and normal banner after reboot.
+
+Queue behavior follows the [Emy/SpeakJet manual](https://www.polaxis.be/product/speakjet-vox/)
+and the supplied SpeakJet user manual's native MSA input buffer and transition
+model. The panel's input FIFO policy selects when allophones reach that engine;
+it does not concatenate separately rendered audio clips.
+
+0.9.1 retains the 0.4.3 engine/table provenance above and implements the previously
+missing PITCH, FX and ERROR controls, and adds switch debounce and visible mode
+feedback. Flashing 0.8 does not restore PITCH, FX or ERROR: the earlier panel
+loop did not read those inputs. Its basic switch-mode logic was already present. Keep 0.8 and 0.9 UF2s for rollback. A physical
+control check is required for future releases in addition to serial rendering
+and underrun measurements.

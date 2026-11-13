@@ -1,0 +1,1090 @@
+Talko_SpeakJet 0.9.1 build=normal engine=0.4.3 sample_hz=8026 block_samples=64 budget_us=7974 prefill_samples=128
+PANEL mode=queue pins=10 pitch=1789 speed=1356 fx=26 effect=3 error=0 sound=1320 buffered=0 frozen=0
+PLAY bank=0 item=1 label=HELLO mode=speech
+HELLO
+STOP
+RESULT bank=0 item=1 label=HELLO status=done blocks=77 avg_us=5499 peak_us=6718 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=0 item=2 label=READY mode=speech
+READY
+STOP
+RESULT bank=0 item=2 label=READY status=done blocks=71 avg_us=5569 peak_us=7422 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=0 item=3 label=ROBOT mode=speech
+ROBOT
+STOP
+RESULT bank=0 item=3 label=ROBOT status=done blocks=116 avg_us=5544 peak_us=7426 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=0 item=4 label=DANGER mode=speech
+DANGER
+STOP
+RESULT bank=0 item=4 label=DANGER status=done blocks=109 avg_us=5831 peak_us=7417 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=0 item=5 label=TALKO mode=speech
+TALKO
+STOP
+RESULT bank=0 item=5 label=TALKO status=done blocks=91 avg_us=5499 peak_us=6217 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=speech
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=done blocks=644 avg_us=5771 peak_us=7459 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=1 item=1 label=IY code=128 mode=speech
+IY
+STOP
+RESULT bank=1 item=1 label=IY status=done blocks=26 avg_us=5241 peak_us=6056 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=128 mode=speech
+PLAY bank=1 item=2 label=IH code=129 mode=speech
+IH
+STOP
+RESULT bank=1 item=2 label=IH status=done blocks=29 avg_us=5275 peak_us=5989 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=129 mode=speech
+PLAY bank=1 item=3 label=EY code=130 mode=speech
+EY
+STOP
+RESULT bank=1 item=3 label=EY status=done blocks=29 avg_us=5265 peak_us=6022 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=130 mode=speech
+PLAY bank=1 item=4 label=EH code=131 mode=speech
+EH
+STOP
+RESULT bank=1 item=4 label=EH status=done blocks=29 avg_us=5255 peak_us=6040 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=131 mode=speech
+PLAY bank=1 item=5 label=AY code=132 mode=speech
+AY
+STOP
+RESULT bank=1 item=5 label=AY status=done blocks=32 avg_us=5289 peak_us=6050 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=132 mode=speech
+PLAY bank=1 item=6 label=AX code=133 mode=speech
+AX
+STOP
+RESULT bank=1 item=6 label=AX status=done blocks=28 avg_us=5246 peak_us=6017 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=133 mode=speech
+PLAY bank=1 item=7 label=UX code=134 mode=speech
+UX
+STOP
+RESULT bank=1 item=7 label=UX status=done blocks=29 avg_us=5268 peak_us=6042 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=134 mode=speech
+PLAY bank=1 item=8 label=OH code=135 mode=speech
+OH
+STOP
+RESULT bank=1 item=8 label=OH status=done blocks=28 avg_us=5254 peak_us=6015 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=135 mode=speech
+PLAY bank=1 item=9 label=AW code=136 mode=speech
+AW
+STOP
+RESULT bank=1 item=9 label=AW status=done blocks=28 avg_us=5253 peak_us=6018 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=136 mode=speech
+PLAY bank=1 item=10 label=OW code=137 mode=speech
+OW
+STOP
+RESULT bank=1 item=10 label=OW status=done blocks=26 avg_us=5220 peak_us=6073 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=137 mode=speech
+PLAY bank=1 item=11 label=UH code=138 mode=speech
+UH
+STOP
+RESULT bank=1 item=11 label=UH status=done blocks=26 avg_us=5253 peak_us=6071 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=138 mode=speech
+PLAY bank=1 item=12 label=UW code=139 mode=speech
+UW
+STOP
+RESULT bank=1 item=12 label=UW status=done blocks=25 avg_us=5234 peak_us=6037 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=139 mode=speech
+PLAY bank=2 item=1 label=IY code=128 mode=speech
+IY
+STOP
+RESULT bank=2 item=1 label=IY status=done blocks=26 avg_us=5226 peak_us=6071 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=128 mode=speech
+PLAY bank=2 item=2 label=IH code=129 mode=speech
+IH
+STOP
+RESULT bank=2 item=2 label=IH status=done blocks=29 avg_us=5273 peak_us=5984 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=129 mode=speech
+PLAY bank=2 item=3 label=EY code=130 mode=speech
+EY
+STOP
+RESULT bank=2 item=3 label=EY status=done blocks=29 avg_us=5257 peak_us=6039 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=130 mode=speech
+PLAY bank=2 item=4 label=EH code=131 mode=speech
+EH
+STOP
+RESULT bank=2 item=4 label=EH status=done blocks=29 avg_us=5270 peak_us=6028 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=131 mode=speech
+PLAY bank=2 item=5 label=AY code=132 mode=speech
+AY
+STOP
+RESULT bank=2 item=5 label=AY status=done blocks=32 avg_us=5288 peak_us=6036 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=132 mode=speech
+PLAY bank=2 item=6 label=AX code=133 mode=speech
+AX
+STOP
+RESULT bank=2 item=6 label=AX status=done blocks=28 avg_us=5245 peak_us=6056 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=133 mode=speech
+PLAY bank=2 item=7 label=UX code=134 mode=speech
+UX
+STOP
+RESULT bank=2 item=7 label=UX status=done blocks=29 avg_us=5267 peak_us=6029 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=134 mode=speech
+PLAY bank=2 item=8 label=OH code=135 mode=speech
+OH
+STOP
+RESULT bank=2 item=8 label=OH status=done blocks=28 avg_us=5264 peak_us=6022 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=135 mode=speech
+PLAY bank=2 item=9 label=AW code=136 mode=speech
+AW
+STOP
+RESULT bank=2 item=9 label=AW status=done blocks=28 avg_us=5260 peak_us=6023 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=136 mode=speech
+PLAY bank=2 item=10 label=OW code=137 mode=speech
+OW
+STOP
+RESULT bank=2 item=10 label=OW status=done blocks=26 avg_us=5219 peak_us=6021 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=137 mode=speech
+PLAY bank=2 item=11 label=UH code=138 mode=speech
+UH
+STOP
+RESULT bank=2 item=11 label=UH status=done blocks=26 avg_us=5247 peak_us=6008 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=138 mode=speech
+PLAY bank=2 item=12 label=UW code=139 mode=speech
+UW
+STOP
+RESULT bank=2 item=12 label=UW status=done blocks=25 avg_us=5234 peak_us=6024 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=139 mode=speech
+PLAY bank=2 item=13 label=MM code=140 mode=speech
+MM
+STOP
+RESULT bank=2 item=13 label=MM status=done blocks=21 avg_us=5166 peak_us=6028 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=140 mode=speech
+PLAY bank=2 item=14 label=NE code=141 mode=speech
+NE
+STOP
+RESULT bank=2 item=14 label=NE status=done blocks=21 avg_us=6192 peak_us=7084 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=141 mode=speech
+PLAY bank=2 item=15 label=NO code=142 mode=speech
+NO
+STOP
+RESULT bank=2 item=15 label=NO status=done blocks=22 avg_us=6218 peak_us=7080 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=142 mode=speech
+PLAY bank=2 item=16 label=NGE code=143 mode=speech
+NGE
+STOP
+RESULT bank=2 item=16 label=NGE status=done blocks=21 avg_us=6202 peak_us=7090 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=143 mode=speech
+PLAY bank=2 item=17 label=NGO code=144 mode=speech
+NGO
+STOP
+RESULT bank=2 item=17 label=NGO status=done blocks=20 avg_us=5148 peak_us=6065 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=144 mode=speech
+PLAY bank=2 item=18 label=LE code=145 mode=speech
+LE
+STOP
+RESULT bank=2 item=18 label=LE status=done blocks=24 avg_us=5236 peak_us=6030 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=145 mode=speech
+PLAY bank=2 item=19 label=LO code=146 mode=speech
+LO
+STOP
+RESULT bank=2 item=19 label=LO status=done blocks=23 avg_us=5201 peak_us=6034 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=146 mode=speech
+PLAY bank=2 item=20 label=WW code=147 mode=speech
+WW
+STOP
+RESULT bank=2 item=20 label=WW status=done blocks=23 avg_us=5169 peak_us=6021 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=147 mode=speech
+PLAY bank=2 item=21 label=RR code=148 mode=speech
+RR
+STOP
+RESULT bank=2 item=21 label=RR status=done blocks=26 avg_us=5234 peak_us=6010 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=148 mode=speech
+PLAY bank=2 item=22 label=IYRR code=149 mode=speech
+IYRR
+STOP
+RESULT bank=2 item=22 label=IYRR status=done blocks=50 avg_us=5454 peak_us=6059 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=149 mode=speech
+PLAY bank=2 item=23 label=EYRR code=150 mode=speech
+EYRR
+STOP
+RESULT bank=2 item=23 label=EYRR status=done blocks=51 avg_us=5459 peak_us=6088 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=150 mode=speech
+PLAY bank=2 item=24 label=AXRR code=151 mode=speech
+AXRR
+STOP
+RESULT bank=2 item=24 label=AXRR status=done blocks=51 avg_us=5460 peak_us=6079 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=151 mode=speech
+PLAY bank=2 item=25 label=AWRR code=152 mode=speech
+AWRR
+STOP
+RESULT bank=2 item=25 label=AWRR status=done blocks=51 avg_us=5441 peak_us=6131 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=152 mode=speech
+PLAY bank=2 item=26 label=OWRR code=153 mode=speech
+OWRR
+STOP
+RESULT bank=2 item=26 label=OWRR status=done blocks=46 avg_us=5350 peak_us=6089 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=153 mode=speech
+PLAY bank=2 item=27 label=EYIY code=154 mode=speech
+EYIY
+STOP
+RESULT bank=2 item=27 label=EYIY status=done blocks=46 avg_us=5372 peak_us=6090 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=154 mode=speech
+PLAY bank=2 item=28 label=OHIY code=155 mode=speech
+OHIY
+STOP
+RESULT bank=2 item=28 label=OHIY status=done blocks=53 avg_us=5449 peak_us=6043 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=155 mode=speech
+PLAY bank=2 item=29 label=OWIY code=156 mode=speech
+OWIY
+STOP
+RESULT bank=2 item=29 label=OWIY status=done blocks=54 avg_us=5440 peak_us=6025 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=156 mode=speech
+PLAY bank=2 item=30 label=OHIH code=157 mode=speech
+OHIH
+STOP
+RESULT bank=2 item=30 label=OHIH status=done blocks=48 avg_us=5437 peak_us=6046 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=157 mode=speech
+PLAY bank=2 item=31 label=IYEH code=158 mode=speech
+IYEH
+STOP
+RESULT bank=2 item=31 label=IYEH status=done blocks=46 avg_us=5363 peak_us=6064 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=158 mode=speech
+PLAY bank=2 item=32 label=EHLL code=159 mode=speech
+EHLL
+STOP
+RESULT bank=2 item=32 label=EHLL status=done blocks=38 avg_us=5342 peak_us=6088 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=159 mode=speech
+PLAY bank=2 item=33 label=IYUW code=160 mode=speech
+IYUW
+STOP
+RESULT bank=2 item=33 label=IYUW status=done blocks=47 avg_us=5467 peak_us=6055 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=160 mode=speech
+PLAY bank=2 item=34 label=AXUW code=161 mode=speech
+AXUW
+STOP
+RESULT bank=2 item=34 label=AXUW status=done blocks=44 avg_us=5369 peak_us=6082 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=161 mode=speech
+PLAY bank=2 item=35 label=IHWW code=162 mode=speech
+IHWW
+STOP
+RESULT bank=2 item=35 label=IHWW status=done blocks=53 avg_us=5451 peak_us=6053 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=162 mode=speech
+PLAY bank=2 item=36 label=AYWW code=163 mode=speech
+AYWW
+STOP
+RESULT bank=2 item=36 label=AYWW status=done blocks=52 avg_us=5428 peak_us=6100 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=163 mode=speech
+PLAY bank=2 item=37 label=OWWW code=164 mode=speech
+OWWW
+STOP
+RESULT bank=2 item=37 label=OWWW status=done blocks=45 avg_us=5361 peak_us=6082 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=164 mode=speech
+PLAY bank=2 item=38 label=JH code=165 mode=speech
+JH
+STOP
+RESULT bank=2 item=38 label=JH status=done blocks=18 avg_us=5694 peak_us=6757 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=165 mode=speech
+PLAY bank=2 item=39 label=VV code=166 mode=speech
+VV
+STOP
+RESULT bank=2 item=39 label=VV status=done blocks=22 avg_us=6230 peak_us=7033 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=166 mode=speech
+PLAY bank=2 item=40 label=ZZ code=167 mode=speech
+ZZ
+STOP
+RESULT bank=2 item=40 label=ZZ status=done blocks=22 avg_us=6211 peak_us=7141 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=167 mode=speech
+PLAY bank=2 item=41 label=ZH code=168 mode=speech
+ZH
+STOP
+RESULT bank=2 item=41 label=ZH status=done blocks=20 avg_us=6195 peak_us=7101 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=168 mode=speech
+PLAY bank=2 item=42 label=DH code=169 mode=speech
+DH
+STOP
+RESULT bank=2 item=42 label=DH status=done blocks=20 avg_us=6183 peak_us=7149 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=169 mode=speech
+PLAY bank=2 item=43 label=BE code=170 mode=speech
+BE
+STOP
+RESULT bank=2 item=43 label=BE status=done blocks=16 avg_us=5643 peak_us=6730 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=170 mode=speech
+PLAY bank=2 item=44 label=BO code=171 mode=speech
+BO
+STOP
+RESULT bank=2 item=44 label=BO status=done blocks=17 avg_us=5738 peak_us=6749 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=171 mode=speech
+PLAY bank=2 item=45 label=EB code=172 mode=speech
+EB
+STOP
+RESULT bank=2 item=45 label=EB status=done blocks=10 avg_us=5610 peak_us=6753 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=172 mode=speech
+PLAY bank=2 item=46 label=OB code=173 mode=speech
+OB
+STOP
+RESULT bank=2 item=46 label=OB status=done blocks=7 avg_us=5575 peak_us=6826 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=173 mode=speech
+PLAY bank=2 item=47 label=DE code=174 mode=speech
+DE
+STOP
+RESULT bank=2 item=47 label=DE status=done blocks=15 avg_us=5569 peak_us=6673 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=174 mode=speech
+PLAY bank=2 item=48 label=DO code=175 mode=speech
+DO
+STOP
+RESULT bank=2 item=48 label=DO status=done blocks=16 avg_us=5491 peak_us=6728 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=175 mode=speech
+PLAY bank=2 item=49 label=ED code=176 mode=speech
+ED
+STOP
+RESULT bank=2 item=49 label=ED status=done blocks=11 avg_us=5890 peak_us=6844 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=176 mode=speech
+PLAY bank=2 item=50 label=OD code=177 mode=speech
+OD
+STOP
+RESULT bank=2 item=50 label=OD status=done blocks=10 avg_us=5661 peak_us=6925 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=177 mode=speech
+PLAY bank=2 item=51 label=GE code=178 mode=speech
+GE
+STOP
+RESULT bank=2 item=51 label=GE status=done blocks=11 avg_us=5537 peak_us=6690 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=178 mode=speech
+PLAY bank=2 item=52 label=GO code=179 mode=speech
+GO
+STOP
+RESULT bank=2 item=52 label=GO status=done blocks=12 avg_us=5768 peak_us=6829 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=179 mode=speech
+PLAY bank=2 item=53 label=EG code=180 mode=speech
+EG
+STOP
+RESULT bank=2 item=53 label=EG status=done blocks=10 avg_us=5413 peak_us=6894 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=180 mode=speech
+PLAY bank=2 item=54 label=OG code=181 mode=speech
+OG
+STOP
+RESULT bank=2 item=54 label=OG status=done blocks=7 avg_us=5521 peak_us=6708 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=181 mode=speech
+PLAY bank=3 item=1 label=BE code=170 mode=speech
+BE
+STOP
+RESULT bank=3 item=1 label=BE status=done blocks=16 avg_us=5664 peak_us=6704 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=170 mode=speech
+PLAY bank=3 item=2 label=BO code=171 mode=speech
+BO
+STOP
+RESULT bank=3 item=2 label=BO status=done blocks=17 avg_us=5744 peak_us=6709 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=171 mode=speech
+PLAY bank=3 item=3 label=EB code=172 mode=speech
+EB
+STOP
+RESULT bank=3 item=3 label=EB status=done blocks=10 avg_us=5615 peak_us=6738 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=172 mode=speech
+PLAY bank=3 item=4 label=OB code=173 mode=speech
+OB
+STOP
+RESULT bank=3 item=4 label=OB status=done blocks=7 avg_us=5542 peak_us=6820 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=173 mode=speech
+PLAY bank=3 item=5 label=DE code=174 mode=speech
+DE
+STOP
+RESULT bank=3 item=5 label=DE status=done blocks=15 avg_us=5566 peak_us=6630 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=174 mode=speech
+PLAY bank=3 item=6 label=DO code=175 mode=speech
+DO
+STOP
+RESULT bank=3 item=6 label=DO status=done blocks=16 avg_us=5486 peak_us=6729 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=175 mode=speech
+PLAY bank=3 item=7 label=ED code=176 mode=speech
+ED
+STOP
+RESULT bank=3 item=7 label=ED status=done blocks=11 avg_us=5920 peak_us=6849 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=176 mode=speech
+PLAY bank=3 item=8 label=OD code=177 mode=speech
+OD
+STOP
+RESULT bank=3 item=8 label=OD status=done blocks=10 avg_us=5647 peak_us=6862 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=177 mode=speech
+PLAY bank=3 item=9 label=GE code=178 mode=speech
+GE
+STOP
+RESULT bank=3 item=9 label=GE status=done blocks=11 avg_us=5531 peak_us=6706 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=178 mode=speech
+PLAY bank=3 item=10 label=GO code=179 mode=speech
+GO
+STOP
+RESULT bank=3 item=10 label=GO status=done blocks=12 avg_us=5761 peak_us=6794 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=179 mode=speech
+PLAY bank=3 item=11 label=EG code=180 mode=speech
+EG
+STOP
+RESULT bank=3 item=11 label=EG status=done blocks=10 avg_us=5415 peak_us=6884 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=180 mode=speech
+PLAY bank=3 item=12 label=OG code=181 mode=speech
+OG
+STOP
+RESULT bank=3 item=12 label=OG status=done blocks=7 avg_us=5528 peak_us=6725 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=181 mode=speech
+PLAY bank=4 item=1 label=CH code=182 mode=speech
+CH
+STOP
+RESULT bank=4 item=1 label=CH status=done blocks=18 avg_us=5399 peak_us=6299 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=182 mode=speech
+PLAY bank=4 item=2 label=HE code=183 mode=speech
+HE
+STOP
+RESULT bank=4 item=2 label=HE status=done blocks=15 avg_us=5692 peak_us=6995 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=183 mode=speech
+PLAY bank=4 item=3 label=HO code=184 mode=speech
+HO
+STOP
+RESULT bank=4 item=3 label=HO status=done blocks=15 avg_us=5606 peak_us=6650 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=184 mode=speech
+PLAY bank=4 item=4 label=WH code=185 mode=speech
+WH
+STOP
+RESULT bank=4 item=4 label=WH status=done blocks=15 avg_us=5605 peak_us=6482 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=185 mode=speech
+PLAY bank=4 item=5 label=FF code=186 mode=speech
+FF
+STOP
+RESULT bank=4 item=5 label=FF status=done blocks=16 avg_us=5634 peak_us=6608 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=186 mode=speech
+PLAY bank=4 item=6 label=SE code=187 mode=speech
+SE
+STOP
+RESULT bank=4 item=6 label=SE status=done blocks=19 avg_us=5739 peak_us=7037 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=187 mode=speech
+PLAY bank=4 item=7 label=SO code=188 mode=speech
+SO
+STOP
+RESULT bank=4 item=7 label=SO status=done blocks=20 avg_us=5780 peak_us=7027 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=188 mode=speech
+PLAY bank=4 item=8 label=SH code=189 mode=speech
+SH
+STOP
+RESULT bank=4 item=8 label=SH status=done blocks=14 avg_us=5698 peak_us=7065 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=189 mode=speech
+PLAY bank=4 item=9 label=TH code=190 mode=speech
+TH
+STOP
+RESULT bank=4 item=9 label=TH status=done blocks=10 avg_us=5473 peak_us=6498 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=190 mode=speech
+PLAY bank=4 item=10 label=TT code=191 mode=speech
+TT
+STOP
+RESULT bank=4 item=10 label=TT status=done blocks=14 avg_us=5097 peak_us=6210 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=191 mode=speech
+PLAY bank=4 item=11 label=TU code=192 mode=speech
+TU
+STOP
+RESULT bank=4 item=11 label=TU status=done blocks=21 avg_us=5636 peak_us=6207 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=192 mode=speech
+PLAY bank=4 item=12 label=TS code=193 mode=speech
+TS
+STOP
+RESULT bank=4 item=12 label=TS status=done blocks=25 avg_us=5583 peak_us=6145 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=193 mode=speech
+PLAY bank=4 item=13 label=KE code=194 mode=speech
+KE
+STOP
+RESULT bank=4 item=13 label=KE status=done blocks=11 avg_us=4906 peak_us=6205 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=194 mode=speech
+PLAY bank=4 item=14 label=KO code=195 mode=speech
+KO
+STOP
+RESULT bank=4 item=14 label=KO status=done blocks=12 avg_us=5096 peak_us=6196 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=195 mode=speech
+PLAY bank=4 item=15 label=EK code=196 mode=speech
+EK
+STOP
+RESULT bank=4 item=15 label=EK status=done blocks=9 avg_us=4931 peak_us=6265 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=196 mode=speech
+PLAY bank=4 item=16 label=OK code=197 mode=speech
+OK
+STOP
+RESULT bank=4 item=16 label=OK status=done blocks=10 avg_us=4924 peak_us=6249 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=197 mode=speech
+PLAY bank=4 item=17 label=PE code=198 mode=speech
+PE
+STOP
+RESULT bank=4 item=17 label=PE status=done blocks=19 avg_us=5372 peak_us=6168 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=198 mode=speech
+PLAY bank=4 item=18 label=PO code=199 mode=speech
+PO
+STOP
+RESULT bank=4 item=18 label=PO status=done blocks=13 avg_us=5525 peak_us=6197 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=199 mode=speech
+PLAY bank=5 item=1 label=IY code=128 mode=speech
+IY
+STOP
+RESULT bank=5 item=1 label=IY status=done blocks=26 avg_us=5241 peak_us=6070 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=128 mode=speech
+PLAY bank=5 item=2 label=IH code=129 mode=speech
+IH
+STOP
+RESULT bank=5 item=2 label=IH status=done blocks=29 avg_us=5271 peak_us=6059 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=129 mode=speech
+PLAY bank=5 item=3 label=EY code=130 mode=speech
+EY
+STOP
+RESULT bank=5 item=3 label=EY status=done blocks=29 avg_us=5266 peak_us=6032 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=130 mode=speech
+PLAY bank=5 item=4 label=EH code=131 mode=speech
+EH
+STOP
+RESULT bank=5 item=4 label=EH status=done blocks=29 avg_us=5261 peak_us=6001 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=131 mode=speech
+PLAY bank=5 item=5 label=AY code=132 mode=speech
+AY
+STOP
+RESULT bank=5 item=5 label=AY status=done blocks=32 avg_us=5288 peak_us=6052 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=132 mode=speech
+PLAY bank=5 item=6 label=AX code=133 mode=speech
+AX
+STOP
+RESULT bank=5 item=6 label=AX status=done blocks=28 avg_us=5252 peak_us=6025 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=133 mode=speech
+PLAY bank=5 item=7 label=UX code=134 mode=speech
+UX
+STOP
+RESULT bank=5 item=7 label=UX status=done blocks=29 avg_us=5268 peak_us=6037 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=134 mode=speech
+PLAY bank=5 item=8 label=OH code=135 mode=speech
+OH
+STOP
+RESULT bank=5 item=8 label=OH status=done blocks=28 avg_us=5255 peak_us=6034 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=135 mode=speech
+PLAY bank=5 item=9 label=AW code=136 mode=speech
+AW
+STOP
+RESULT bank=5 item=9 label=AW status=done blocks=28 avg_us=5258 peak_us=6039 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=136 mode=speech
+PLAY bank=5 item=10 label=OW code=137 mode=speech
+OW
+STOP
+RESULT bank=5 item=10 label=OW status=done blocks=26 avg_us=5230 peak_us=6035 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=137 mode=speech
+PLAY bank=5 item=11 label=UH code=138 mode=speech
+UH
+STOP
+RESULT bank=5 item=11 label=UH status=done blocks=26 avg_us=5243 peak_us=6037 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=138 mode=speech
+PLAY bank=5 item=12 label=UW code=139 mode=speech
+UW
+STOP
+RESULT bank=5 item=12 label=UW status=done blocks=25 avg_us=5234 peak_us=6044 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=139 mode=speech
+PLAY bank=5 item=13 label=MM code=140 mode=speech
+MM
+STOP
+RESULT bank=5 item=13 label=MM status=done blocks=21 avg_us=5169 peak_us=5996 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=140 mode=speech
+PLAY bank=5 item=14 label=NE code=141 mode=speech
+NE
+STOP
+RESULT bank=5 item=14 label=NE status=done blocks=21 avg_us=6198 peak_us=7081 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=141 mode=speech
+PLAY bank=5 item=15 label=NO code=142 mode=speech
+NO
+STOP
+RESULT bank=5 item=15 label=NO status=done blocks=22 avg_us=6230 peak_us=7102 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=142 mode=speech
+PLAY bank=5 item=16 label=NGE code=143 mode=speech
+NGE
+STOP
+RESULT bank=5 item=16 label=NGE status=done blocks=21 avg_us=6196 peak_us=7069 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=143 mode=speech
+PLAY bank=5 item=17 label=NGO code=144 mode=speech
+NGO
+STOP
+RESULT bank=5 item=17 label=NGO status=done blocks=20 avg_us=5154 peak_us=6030 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=144 mode=speech
+PLAY bank=5 item=18 label=LE code=145 mode=speech
+LE
+STOP
+RESULT bank=5 item=18 label=LE status=done blocks=24 avg_us=5235 peak_us=6022 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=145 mode=speech
+PLAY bank=5 item=19 label=LO code=146 mode=speech
+LO
+STOP
+RESULT bank=5 item=19 label=LO status=done blocks=23 avg_us=5199 peak_us=6016 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=146 mode=speech
+PLAY bank=5 item=20 label=WW code=147 mode=speech
+WW
+STOP
+RESULT bank=5 item=20 label=WW status=done blocks=23 avg_us=5173 peak_us=6034 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=147 mode=speech
+PLAY bank=5 item=21 label=RR code=148 mode=speech
+RR
+STOP
+RESULT bank=5 item=21 label=RR status=done blocks=26 avg_us=5231 peak_us=5982 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=148 mode=speech
+PLAY bank=5 item=22 label=IYRR code=149 mode=speech
+IYRR
+STOP
+RESULT bank=5 item=22 label=IYRR status=done blocks=50 avg_us=5454 peak_us=6038 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=149 mode=speech
+PLAY bank=5 item=23 label=EYRR code=150 mode=speech
+EYRR
+STOP
+RESULT bank=5 item=23 label=EYRR status=done blocks=51 avg_us=5455 peak_us=6097 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=150 mode=speech
+PLAY bank=5 item=24 label=AXRR code=151 mode=speech
+AXRR
+STOP
+RESULT bank=5 item=24 label=AXRR status=done blocks=51 avg_us=5459 peak_us=6064 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=151 mode=speech
+PLAY bank=5 item=25 label=AWRR code=152 mode=speech
+AWRR
+STOP
+RESULT bank=5 item=25 label=AWRR status=done blocks=51 avg_us=5433 peak_us=6044 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=152 mode=speech
+PLAY bank=5 item=26 label=OWRR code=153 mode=speech
+OWRR
+STOP
+RESULT bank=5 item=26 label=OWRR status=done blocks=46 avg_us=5354 peak_us=6050 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=153 mode=speech
+PLAY bank=5 item=27 label=EYIY code=154 mode=speech
+EYIY
+STOP
+RESULT bank=5 item=27 label=EYIY status=done blocks=46 avg_us=5374 peak_us=6100 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=154 mode=speech
+PLAY bank=5 item=28 label=OHIY code=155 mode=speech
+OHIY
+STOP
+RESULT bank=5 item=28 label=OHIY status=done blocks=53 avg_us=5455 peak_us=6108 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=155 mode=speech
+PLAY bank=5 item=29 label=OWIY code=156 mode=speech
+OWIY
+STOP
+RESULT bank=5 item=29 label=OWIY status=done blocks=54 avg_us=5446 peak_us=6082 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=156 mode=speech
+PLAY bank=5 item=30 label=OHIH code=157 mode=speech
+OHIH
+STOP
+RESULT bank=5 item=30 label=OHIH status=done blocks=48 avg_us=5446 peak_us=6031 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=157 mode=speech
+PLAY bank=5 item=31 label=IYEH code=158 mode=speech
+IYEH
+STOP
+RESULT bank=5 item=31 label=IYEH status=done blocks=45 avg_us=5464 peak_us=6084 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=158 mode=speech
+PLAY bank=5 item=32 label=EHLL code=159 mode=speech
+EHLL
+STOP
+RESULT bank=5 item=32 label=EHLL status=done blocks=38 avg_us=5341 peak_us=6043 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=159 mode=speech
+PLAY bank=5 item=33 label=IYUW code=160 mode=speech
+IYUW
+STOP
+RESULT bank=5 item=33 label=IYUW status=done blocks=47 avg_us=5467 peak_us=6111 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=160 mode=speech
+PLAY bank=5 item=34 label=AXUW code=161 mode=speech
+AXUW
+STOP
+RESULT bank=5 item=34 label=AXUW status=done blocks=44 avg_us=5363 peak_us=6157 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=161 mode=speech
+PLAY bank=5 item=35 label=IHWW code=162 mode=speech
+IHWW
+STOP
+RESULT bank=5 item=35 label=IHWW status=done blocks=53 avg_us=5455 peak_us=6032 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=162 mode=speech
+PLAY bank=5 item=36 label=AYWW code=163 mode=speech
+AYWW
+STOP
+RESULT bank=5 item=36 label=AYWW status=done blocks=52 avg_us=5434 peak_us=6089 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=163 mode=speech
+PLAY bank=5 item=37 label=OWWW code=164 mode=speech
+OWWW
+STOP
+RESULT bank=5 item=37 label=OWWW status=done blocks=45 avg_us=5357 peak_us=6053 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=164 mode=speech
+PLAY bank=5 item=38 label=JH code=165 mode=speech
+JH
+STOP
+RESULT bank=5 item=38 label=JH status=done blocks=18 avg_us=5709 peak_us=6788 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=165 mode=speech
+PLAY bank=5 item=39 label=VV code=166 mode=speech
+VV
+RESULT bank=5 item=39 label=VV status=done blocks=22 avg_us=6228 peak_us=7122 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=166 mode=speech
+STOP
+PLAY bank=5 item=40 label=ZZ code=167 mode=speech
+ZZ
+STOP
+RESULT bank=5 item=40 label=ZZ status=done blocks=22 avg_us=6215 peak_us=7128 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=167 mode=speech
+PLAY bank=5 item=41 label=ZH code=168 mode=speech
+ZH
+STOP
+RESULT bank=5 item=41 label=ZH status=done blocks=20 avg_us=6189 peak_us=7081 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=168 mode=speech
+PLAY bank=5 item=42 label=DH code=169 mode=speech
+DH
+STOP
+RESULT bank=5 item=42 label=DH status=done blocks=20 avg_us=6165 peak_us=7132 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=169 mode=speech
+PLAY bank=5 item=43 label=BE code=170 mode=speech
+BE
+STOP
+RESULT bank=5 item=43 label=BE status=done blocks=16 avg_us=5654 peak_us=6701 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=170 mode=speech
+PLAY bank=5 item=44 label=BO code=171 mode=speech
+BO
+STOP
+RESULT bank=5 item=44 label=BO status=done blocks=17 avg_us=5739 peak_us=6731 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=171 mode=speech
+PLAY bank=5 item=45 label=EB code=172 mode=speech
+EB
+STOP
+RESULT bank=5 item=45 label=EB status=done blocks=10 avg_us=5627 peak_us=6730 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=172 mode=speech
+PLAY bank=5 item=46 label=OB code=173 mode=speech
+OB
+STOP
+RESULT bank=5 item=46 label=OB status=done blocks=7 avg_us=5563 peak_us=6863 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=173 mode=speech
+PLAY bank=5 item=47 label=DE code=174 mode=speech
+DE
+STOP
+RESULT bank=5 item=47 label=DE status=done blocks=15 avg_us=5578 peak_us=6671 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=174 mode=speech
+PLAY bank=5 item=48 label=DO code=175 mode=speech
+DO
+STOP
+RESULT bank=5 item=48 label=DO status=done blocks=16 avg_us=5481 peak_us=6694 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=175 mode=speech
+PLAY bank=5 item=49 label=ED code=176 mode=speech
+ED
+STOP
+RESULT bank=5 item=49 label=ED status=done blocks=11 avg_us=5919 peak_us=6866 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=176 mode=speech
+PLAY bank=5 item=50 label=OD code=177 mode=speech
+OD
+STOP
+RESULT bank=5 item=50 label=OD status=done blocks=10 avg_us=5665 peak_us=6902 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=177 mode=speech
+PLAY bank=5 item=51 label=GE code=178 mode=speech
+GE
+STOP
+RESULT bank=5 item=51 label=GE status=done blocks=11 avg_us=5527 peak_us=6670 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=178 mode=speech
+PLAY bank=5 item=52 label=GO code=179 mode=speech
+GO
+STOP
+RESULT bank=5 item=52 label=GO status=done blocks=12 avg_us=5757 peak_us=6837 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=179 mode=speech
+PLAY bank=5 item=53 label=EG code=180 mode=speech
+EG
+STOP
+RESULT bank=5 item=53 label=EG status=done blocks=10 avg_us=5419 peak_us=6905 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=180 mode=speech
+PLAY bank=5 item=54 label=OG code=181 mode=speech
+OG
+STOP
+RESULT bank=5 item=54 label=OG status=done blocks=7 avg_us=5539 peak_us=6782 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=181 mode=speech
+PLAY bank=5 item=55 label=CH code=182 mode=speech
+CH
+STOP
+RESULT bank=5 item=55 label=CH status=done blocks=18 avg_us=5405 peak_us=6308 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=182 mode=speech
+PLAY bank=5 item=56 label=HE code=183 mode=speech
+HE
+STOP
+RESULT bank=5 item=56 label=HE status=done blocks=15 avg_us=5684 peak_us=6931 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=183 mode=speech
+PLAY bank=5 item=57 label=HO code=184 mode=speech
+HO
+STOP
+RESULT bank=5 item=57 label=HO status=done blocks=15 avg_us=5594 peak_us=6629 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=184 mode=speech
+PLAY bank=5 item=58 label=WH code=185 mode=speech
+WH
+STOP
+RESULT bank=5 item=58 label=WH status=done blocks=15 avg_us=5597 peak_us=6457 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=185 mode=speech
+PLAY bank=5 item=59 label=FF code=186 mode=speech
+FF
+STOP
+RESULT bank=5 item=59 label=FF status=done blocks=16 avg_us=5631 peak_us=6653 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=186 mode=speech
+PLAY bank=5 item=60 label=SE code=187 mode=speech
+SE
+STOP
+RESULT bank=5 item=60 label=SE status=done blocks=19 avg_us=5738 peak_us=6953 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=187 mode=speech
+PLAY bank=5 item=61 label=SO code=188 mode=speech
+SO
+STOP
+RESULT bank=5 item=61 label=SO status=done blocks=20 avg_us=5767 peak_us=7035 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=188 mode=speech
+PLAY bank=5 item=62 label=SH code=189 mode=speech
+SH
+STOP
+RESULT bank=5 item=62 label=SH status=done blocks=14 avg_us=5708 peak_us=7113 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=189 mode=speech
+PLAY bank=5 item=63 label=TH code=190 mode=speech
+TH
+STOP
+RESULT bank=5 item=63 label=TH status=done blocks=10 avg_us=5477 peak_us=6531 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=190 mode=speech
+PLAY bank=5 item=64 label=TT code=191 mode=speech
+TT
+STOP
+RESULT bank=5 item=64 label=TT status=done blocks=14 avg_us=5087 peak_us=6212 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=191 mode=speech
+PLAY bank=5 item=65 label=TU code=192 mode=speech
+TU
+STOP
+RESULT bank=5 item=65 label=TU status=done blocks=21 avg_us=5647 peak_us=6247 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=192 mode=speech
+PLAY bank=5 item=66 label=TS code=193 mode=speech
+TS
+STOP
+RESULT bank=5 item=66 label=TS status=done blocks=25 avg_us=5602 peak_us=6228 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=193 mode=speech
+PLAY bank=5 item=67 label=KE code=194 mode=speech
+KE
+STOP
+RESULT bank=5 item=67 label=KE status=done blocks=11 avg_us=4902 peak_us=6255 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=194 mode=speech
+PLAY bank=5 item=68 label=KO code=195 mode=speech
+KO
+STOP
+RESULT bank=5 item=68 label=KO status=done blocks=12 avg_us=5096 peak_us=6220 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=195 mode=speech
+PLAY bank=5 item=69 label=EK code=196 mode=speech
+EK
+STOP
+RESULT bank=5 item=69 label=EK status=done blocks=9 avg_us=4930 peak_us=6209 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=196 mode=speech
+PLAY bank=5 item=70 label=OK code=197 mode=speech
+OK
+STOP
+RESULT bank=5 item=70 label=OK status=done blocks=10 avg_us=4907 peak_us=6190 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=197 mode=speech
+PLAY bank=5 item=71 label=PE code=198 mode=speech
+PE
+STOP
+RESULT bank=5 item=71 label=PE status=done blocks=19 avg_us=5363 peak_us=6238 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=198 mode=speech
+PLAY bank=5 item=72 label=PO code=199 mode=speech
+PO
+STOP
+RESULT bank=5 item=72 label=PO status=done blocks=13 avg_us=5535 peak_us=6202 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=199 mode=speech
+PLAY bank=6 item=1 label=ROBOT_0 code=200 sj=R0 mode=speech
+ROBOT_0
+STOP
+RESULT bank=6 item=1 label=ROBOT_0 status=done blocks=19 avg_us=5714 peak_us=6558 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=200 sj=R0 mode=speech
+PLAY bank=6 item=2 label=ROBOT_1 code=201 sj=R1 mode=speech
+ROBOT_1
+STOP
+RESULT bank=6 item=2 label=ROBOT_1 status=done blocks=16 avg_us=5712 peak_us=6507 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=201 sj=R1 mode=speech
+PLAY bank=6 item=3 label=ROBOT_2 code=202 sj=R2 mode=speech
+ROBOT_2
+STOP
+RESULT bank=6 item=3 label=ROBOT_2 status=done blocks=17 avg_us=6025 peak_us=6688 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=202 sj=R2 mode=speech
+PLAY bank=6 item=4 label=ROBOT_3 code=203 sj=R3 mode=speech
+ROBOT_3
+STOP
+RESULT bank=6 item=4 label=ROBOT_3 status=done blocks=18 avg_us=5920 peak_us=7236 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=203 sj=R3 mode=speech
+PLAY bank=6 item=5 label=ROBOT_4 code=204 sj=R4 mode=speech
+ROBOT_4
+STOP
+RESULT bank=6 item=5 label=ROBOT_4 status=done blocks=17 avg_us=5688 peak_us=6888 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=204 sj=R4 mode=speech
+PLAY bank=6 item=6 label=ROBOT_5 code=205 sj=R5 mode=speech
+ROBOT_5
+STOP
+RESULT bank=6 item=6 label=ROBOT_5 status=done blocks=17 avg_us=5535 peak_us=6174 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=205 sj=R5 mode=speech
+PLAY bank=6 item=7 label=ROBOT_6 code=206 sj=R6 mode=speech
+ROBOT_6
+STOP
+RESULT bank=6 item=7 label=ROBOT_6 status=done blocks=17 avg_us=5525 peak_us=6180 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=206 sj=R6 mode=speech
+PLAY bank=6 item=8 label=ROBOT_7 code=207 sj=R7 mode=speech
+ROBOT_7
+STOP
+RESULT bank=6 item=8 label=ROBOT_7 status=done blocks=17 avg_us=5680 peak_us=6305 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=207 sj=R7 mode=speech
+PLAY bank=6 item=9 label=ROBOT_8 code=208 sj=R8 mode=speech
+ROBOT_8
+STOP
+RESULT bank=6 item=9 label=ROBOT_8 status=done blocks=18 avg_us=5678 peak_us=6343 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=208 sj=R8 mode=speech
+PLAY bank=6 item=10 label=ROBOT_9 code=209 sj=R9 mode=speech
+ROBOT_9
+STOP
+RESULT bank=6 item=10 label=ROBOT_9 status=done blocks=18 avg_us=5689 peak_us=6322 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=209 sj=R9 mode=speech
+PLAY bank=6 item=11 label=ALARM_0 code=210 sj=A0 mode=speech
+ALARM_0
+STOP
+RESULT bank=6 item=11 label=ALARM_0 status=done blocks=70 avg_us=6361 peak_us=7088 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=210 sj=A0 mode=speech
+PLAY bank=6 item=12 label=ALARM_1 code=211 sj=A1 mode=speech
+ALARM_1
+STOP
+RESULT bank=6 item=12 label=ALARM_1 status=done blocks=189 avg_us=5809 peak_us=6156 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=211 sj=A1 mode=speech
+PLAY bank=6 item=13 label=ALARM_2 code=212 sj=A2 mode=speech
+ALARM_2
+STOP
+RESULT bank=6 item=13 label=ALARM_2 status=done blocks=187 avg_us=5824 peak_us=6268 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=212 sj=A2 mode=speech
+PLAY bank=6 item=14 label=ALARM_3 code=213 sj=A3 mode=speech
+ALARM_3
+STOP
+RESULT bank=6 item=14 label=ALARM_3 status=done blocks=104 avg_us=5846 peak_us=6160 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=213 sj=A3 mode=speech
+PLAY bank=6 item=15 label=ALARM_4 code=214 sj=A4 mode=speech
+ALARM_4
+STOP
+RESULT bank=6 item=15 label=ALARM_4 status=done blocks=52 avg_us=5855 peak_us=7185 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=214 sj=A4 mode=speech
+PLAY bank=6 item=16 label=ALARM_5 code=215 sj=A5 mode=speech
+ALARM_5
+STOP
+RESULT bank=6 item=16 label=ALARM_5 status=done blocks=111 avg_us=6154 peak_us=6379 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=215 sj=A5 mode=speech
+PLAY bank=6 item=17 label=ALARM_6 code=216 sj=A6 mode=speech
+ALARM_6
+STOP
+RESULT bank=6 item=17 label=ALARM_6 status=done blocks=38 avg_us=6177 peak_us=6797 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=216 sj=A6 mode=speech
+PLAY bank=6 item=18 label=ALARM_7 code=217 sj=A7 mode=speech
+ALARM_7
+STOP
+RESULT bank=6 item=18 label=ALARM_7 status=done blocks=115 avg_us=6337 peak_us=6776 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=217 sj=A7 mode=speech
+PLAY bank=6 item=19 label=ALARM_8 code=218 sj=A8 mode=speech
+ALARM_8
+STOP
+RESULT bank=6 item=19 label=ALARM_8 status=done blocks=55 avg_us=5981 peak_us=6406 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=218 sj=A8 mode=speech
+PLAY bank=6 item=20 label=ALARM_9 code=219 sj=A9 mode=speech
+ALARM_9
+STOP
+RESULT bank=6 item=20 label=ALARM_9 status=done blocks=62 avg_us=5726 peak_us=6811 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=219 sj=A9 mode=speech
+PLAY bank=6 item=21 label=BEEP_0 code=220 sj=B0 mode=speech
+BEEP_0
+STOP
+RESULT bank=6 item=21 label=BEEP_0 status=done blocks=36 avg_us=5301 peak_us=6527 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=220 sj=B0 mode=speech
+PLAY bank=6 item=22 label=BEEP_1 code=221 sj=B1 mode=speech
+BEEP_1
+STOP
+RESULT bank=6 item=22 label=BEEP_1 status=done blocks=78 avg_us=5797 peak_us=6839 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=221 sj=B1 mode=speech
+PLAY bank=6 item=23 label=BEEP_2 code=222 sj=B2 mode=speech
+BEEP_2
+STOP
+RESULT bank=6 item=23 label=BEEP_2 status=done blocks=81 avg_us=6246 peak_us=8206 budget_us=7974 late_blocks=2 underrun_events=0 underrun_samples=0 code=222 sj=B2 mode=speech
+PLAY bank=6 item=24 label=BEEP_3 code=223 sj=B3 mode=speech
+BEEP_3
+STOP
+RESULT bank=6 item=24 label=BEEP_3 status=done blocks=61 avg_us=5726 peak_us=6858 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=223 sj=B3 mode=speech
+PLAY bank=6 item=25 label=BEEP_4 code=224 sj=B4 mode=speech
+BEEP_4
+STOP
+RESULT bank=6 item=25 label=BEEP_4 status=done blocks=74 avg_us=5537 peak_us=6028 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=224 sj=B4 mode=speech
+PLAY bank=6 item=26 label=BEEP_5 code=225 sj=B5 mode=speech
+BEEP_5
+STOP
+RESULT bank=6 item=26 label=BEEP_5 status=done blocks=33 avg_us=5346 peak_us=6004 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=225 sj=B5 mode=speech
+PLAY bank=6 item=27 label=BEEP_6 code=226 sj=B6 mode=speech
+BEEP_6
+STOP
+RESULT bank=6 item=27 label=BEEP_6 status=done blocks=33 avg_us=5111 peak_us=5921 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=226 sj=B6 mode=speech
+PLAY bank=6 item=28 label=BEEP_7 code=227 sj=B7 mode=speech
+BEEP_7
+STOP
+RESULT bank=6 item=28 label=BEEP_7 status=done blocks=35 avg_us=5141 peak_us=5726 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=227 sj=B7 mode=speech
+PLAY bank=6 item=29 label=BEEP_8 code=228 sj=B8 mode=speech
+BEEP_8
+STOP
+RESULT bank=6 item=29 label=BEEP_8 status=done blocks=62 avg_us=6617 peak_us=7335 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=228 sj=B8 mode=speech
+PLAY bank=6 item=30 label=BEEP_9 code=229 sj=B9 mode=speech
+BEEP_9
+STOP
+RESULT bank=6 item=30 label=BEEP_9 status=done blocks=57 avg_us=5834 peak_us=6454 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=229 sj=B9 mode=speech
+PLAY bank=6 item=31 label=BIO_0 code=230 sj=C0 mode=speech
+BIO_0
+STOP
+RESULT bank=6 item=31 label=BIO_0 status=done blocks=52 avg_us=6078 peak_us=6741 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=230 sj=C0 mode=speech
+PLAY bank=6 item=32 label=BIO_1 code=231 sj=C1 mode=speech
+BIO_1
+STOP
+RESULT bank=6 item=32 label=BIO_1 status=done blocks=60 avg_us=5833 peak_us=6429 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=231 sj=C1 mode=speech
+PLAY bank=6 item=33 label=BIO_2 code=232 sj=C2 mode=speech
+BIO_2
+STOP
+RESULT bank=6 item=33 label=BIO_2 status=done blocks=43 avg_us=5786 peak_us=6481 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=232 sj=C2 mode=speech
+PLAY bank=6 item=34 label=BIO_3 code=233 sj=C3 mode=speech
+BIO_3
+STOP
+RESULT bank=6 item=34 label=BIO_3 status=done blocks=60 avg_us=6193 peak_us=6823 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=233 sj=C3 mode=speech
+PLAY bank=6 item=35 label=BIO_4 code=234 sj=C4 mode=speech
+BIO_4
+STOP
+RESULT bank=6 item=35 label=BIO_4 status=done blocks=44 avg_us=5802 peak_us=6472 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=234 sj=C4 mode=speech
+PLAY bank=6 item=36 label=BIO_5 code=235 sj=C5 mode=speech
+BIO_5
+STOP
+RESULT bank=6 item=36 label=BIO_5 status=done blocks=73 avg_us=6059 peak_us=6575 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=235 sj=C5 mode=speech
+PLAY bank=6 item=37 label=BIO_6 code=236 sj=C6 mode=speech
+BIO_6
+STOP
+RESULT bank=6 item=37 label=BIO_6 status=done blocks=67 avg_us=6296 peak_us=6825 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=236 sj=C6 mode=speech
+PLAY bank=6 item=38 label=BIO_7 code=237 sj=C7 mode=speech
+BIO_7
+STOP
+RESULT bank=6 item=38 label=BIO_7 status=done blocks=74 avg_us=5894 peak_us=6604 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=237 sj=C7 mode=speech
+PLAY bank=6 item=39 label=BIO_8 code=238 sj=C8 mode=speech
+BIO_8
+STOP
+RESULT bank=6 item=39 label=BIO_8 status=done blocks=19 avg_us=6046 peak_us=6906 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=238 sj=C8 mode=speech
+PLAY bank=6 item=40 label=BIO_9 code=239 sj=C9 mode=speech
+BIO_9
+STOP
+RESULT bank=6 item=40 label=BIO_9 status=done blocks=16 avg_us=5655 peak_us=6413 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=239 sj=C9 mode=speech
+PLAY bank=6 item=41 label=DTMF_0 code=240 sj=D0 mode=speech
+DTMF_0
+STOP
+RESULT bank=6 item=41 label=DTMF_0 status=done blocks=32 avg_us=5422 peak_us=5968 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=240 sj=D0 mode=speech
+PLAY bank=6 item=42 label=DTMF_1 code=241 sj=D1 mode=speech
+DTMF_1
+STOP
+RESULT bank=6 item=42 label=DTMF_1 status=done blocks=32 avg_us=5414 peak_us=5945 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=241 sj=D1 mode=speech
+PLAY bank=6 item=43 label=DTMF_2 code=242 sj=D2 mode=speech
+DTMF_2
+STOP
+RESULT bank=6 item=43 label=DTMF_2 status=done blocks=32 avg_us=5409 peak_us=5958 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=242 sj=D2 mode=speech
+PLAY bank=6 item=44 label=DTMF_3 code=243 sj=D3 mode=speech
+DTMF_3
+STOP
+RESULT bank=6 item=44 label=DTMF_3 status=done blocks=32 avg_us=5424 peak_us=5927 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=243 sj=D3 mode=speech
+PLAY bank=6 item=45 label=DTMF_4 code=244 sj=D4 mode=speech
+DTMF_4
+STOP
+RESULT bank=6 item=45 label=DTMF_4 status=done blocks=32 avg_us=5407 peak_us=5963 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=244 sj=D4 mode=speech
+PLAY bank=6 item=46 label=DTMF_5 code=245 sj=D5 mode=speech
+DTMF_5
+STOP
+RESULT bank=6 item=46 label=DTMF_5 status=done blocks=32 avg_us=5428 peak_us=5960 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=245 sj=D5 mode=speech
+PLAY bank=6 item=47 label=DTMF_6 code=246 sj=D6 mode=speech
+DTMF_6
+STOP
+RESULT bank=6 item=47 label=DTMF_6 status=done blocks=32 avg_us=5420 peak_us=5955 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=246 sj=D6 mode=speech
+PLAY bank=6 item=48 label=DTMF_7 code=247 sj=D7 mode=speech
+DTMF_7
+STOP
+RESULT bank=6 item=48 label=DTMF_7 status=done blocks=32 avg_us=5422 peak_us=5903 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=247 sj=D7 mode=speech
+PLAY bank=6 item=49 label=DTMF_8 code=248 sj=D8 mode=speech
+DTMF_8
+STOP
+RESULT bank=6 item=49 label=DTMF_8 status=done blocks=32 avg_us=5400 peak_us=5978 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=248 sj=D8 mode=speech
+PLAY bank=6 item=50 label=DTMF_9 code=249 sj=D9 mode=speech
+DTMF_9
+STOP
+RESULT bank=6 item=50 label=DTMF_9 status=done blocks=32 avg_us=5415 peak_us=5922 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=249 sj=D9 mode=speech
+PLAY bank=6 item=51 label=DTMF_S code=250 sj=D10 mode=speech
+DTMF_S
+STOP
+RESULT bank=6 item=51 label=DTMF_S status=done blocks=32 avg_us=5411 peak_us=5964 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=250 sj=D10 mode=speech
+PLAY bank=6 item=52 label=DTMF_R code=251 sj=D11 mode=speech
+DTMF_R
+STOP
+RESULT bank=6 item=52 label=DTMF_R status=done blocks=32 avg_us=5401 peak_us=5941 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=251 sj=D11 mode=speech
+PLAY bank=6 item=53 label=SONAR_PING code=252 sj=M0 mode=speech
+SONAR_PING
+STOP
+RESULT bank=6 item=53 label=SONAR_PING status=done blocks=234 avg_us=6439 peak_us=6968 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=252 sj=M0 mode=speech
+PLAY bank=6 item=54 label=PISTOLSHOT code=253 sj=M1 mode=speech
+PISTOLSHOT
+STOP
+RESULT bank=6 item=54 label=PISTOLSHOT status=done blocks=61 avg_us=6664 peak_us=7593 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=253 sj=M1 mode=speech
+PLAY bank=6 item=55 label=WOW code=254 sj=M2 mode=speech
+WOW
+STOP
+RESULT bank=6 item=55 label=WOW status=done blocks=102 avg_us=5829 peak_us=6271 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=254 sj=M2 mode=speech
+PLAY bank=7 item=1 label=DTMF_0 code=240 sj=D0 mode=speech
+DTMF_0
+STOP
+RESULT bank=7 item=1 label=DTMF_0 status=done blocks=32 avg_us=5415 peak_us=5913 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=240 sj=D0 mode=speech
+PLAY bank=7 item=2 label=DTMF_1 code=241 sj=D1 mode=speech
+DTMF_1
+STOP
+RESULT bank=7 item=2 label=DTMF_1 status=done blocks=32 avg_us=5407 peak_us=5967 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=241 sj=D1 mode=speech
+PLAY bank=7 item=3 label=DTMF_2 code=242 sj=D2 mode=speech
+DTMF_2
+STOP
+RESULT bank=7 item=3 label=DTMF_2 status=done blocks=32 avg_us=5402 peak_us=5922 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=242 sj=D2 mode=speech
+PLAY bank=7 item=4 label=DTMF_3 code=243 sj=D3 mode=speech
+DTMF_3
+STOP
+RESULT bank=7 item=4 label=DTMF_3 status=done blocks=32 avg_us=5430 peak_us=5929 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=243 sj=D3 mode=speech
+PLAY bank=7 item=5 label=DTMF_4 code=244 sj=D4 mode=speech
+DTMF_4
+STOP
+RESULT bank=7 item=5 label=DTMF_4 status=done blocks=32 avg_us=5405 peak_us=5956 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=244 sj=D4 mode=speech
+PLAY bank=7 item=6 label=DTMF_5 code=245 sj=D5 mode=speech
+DTMF_5
+STOP
+RESULT bank=7 item=6 label=DTMF_5 status=done blocks=32 avg_us=5421 peak_us=5979 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=245 sj=D5 mode=speech
+PLAY bank=7 item=7 label=DTMF_6 code=246 sj=D6 mode=speech
+DTMF_6
+STOP
+RESULT bank=7 item=7 label=DTMF_6 status=done blocks=32 avg_us=5426 peak_us=5994 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=246 sj=D6 mode=speech
+PLAY bank=7 item=8 label=DTMF_7 code=247 sj=D7 mode=speech
+DTMF_7
+STOP
+RESULT bank=7 item=8 label=DTMF_7 status=done blocks=32 avg_us=5413 peak_us=5960 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=247 sj=D7 mode=speech
+PLAY bank=7 item=9 label=DTMF_8 code=248 sj=D8 mode=speech
+DTMF_8
+STOP
+RESULT bank=7 item=9 label=DTMF_8 status=done blocks=32 avg_us=5406 peak_us=5948 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=248 sj=D8 mode=speech
+PLAY bank=7 item=10 label=DTMF_9 code=249 sj=D9 mode=speech
+DTMF_9
+STOP
+RESULT bank=7 item=10 label=DTMF_9 status=done blocks=32 avg_us=5425 peak_us=5924 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=249 sj=D9 mode=speech
+PLAY bank=7 item=11 label=DTMF_S code=250 sj=D10 mode=speech
+DTMF_S
+STOP
+RESULT bank=7 item=11 label=DTMF_S status=done blocks=32 avg_us=5407 peak_us=5928 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=250 sj=D10 mode=speech
+PLAY bank=7 item=12 label=DTMF_R code=251 sj=D11 mode=speech
+DTMF_R
+STOP
+RESULT bank=7 item=12 label=DTMF_R status=done blocks=32 avg_us=5405 peak_us=5984 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=251 sj=D11 mode=speech
+PLAY bank=8 item=1 label=ZERO mode=speech
+ZERO
+STOP
+RESULT bank=8 item=1 label=ZERO status=done blocks=108 avg_us=5687 peak_us=7403 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=2 label=ONE mode=speech
+ONE
+STOP
+RESULT bank=8 item=2 label=ONE status=done blocks=64 avg_us=5886 peak_us=7419 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=3 label=TWO mode=speech
+TWO
+STOP
+RESULT bank=8 item=3 label=TWO status=done blocks=69 avg_us=5447 peak_us=6141 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=4 label=THREE mode=speech
+THREE
+STOP
+RESULT bank=8 item=4 label=THREE status=done blocks=64 avg_us=5396 peak_us=6568 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=5 label=FOUR mode=speech
+FOUR
+STOP
+RESULT bank=8 item=5 label=FOUR status=done blocks=74 avg_us=5464 peak_us=6688 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=6 label=FIVE mode=speech
+FIVE
+STOP
+RESULT bank=8 item=6 label=FIVE status=done blocks=81 avg_us=5798 peak_us=7382 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=7 label=SIX mode=speech
+SIX
+STOP
+RESULT bank=8 item=7 label=SIX status=done blocks=69 avg_us=5615 peak_us=7025 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=8 label=SEVEN mode=speech
+SEVEN
+STOP
+RESULT bank=8 item=8 label=SEVEN status=done blocks=93 avg_us=6101 peak_us=7455 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=9 label=EIGHT mode=speech
+EIGHT
+STOP
+RESULT bank=8 item=9 label=EIGHT status=done blocks=67 avg_us=5383 peak_us=6249 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=8 item=10 label=NINE mode=speech
+NINE
+STOP
+RESULT bank=8 item=10 label=NINE status=done blocks=82 avg_us=5994 peak_us=7419 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=53 avg_us=5316 peak_us=6140 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=58 avg_us=6191 peak_us=7644 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=77 avg_us=5383 peak_us=6064 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=35 avg_us=5813 peak_us=6949 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=95 avg_us=5616 peak_us=6388 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=70 avg_us=6125 peak_us=7428 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=64 avg_us=5346 peak_us=6185 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=10 item=1 label=RAW mode=speech
+RAW
+STOP
+RESULT bank=10 item=1 label=RAW status=done blocks=99 avg_us=5250 peak_us=6044 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+PLAY bank=1 item=1 label=IY code=128 mode=queue
+IY
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=2
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=3
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=4
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=5
+STOP
+OW
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=5
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=6
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=7
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=8
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=9
+STOP
+IY
+QUEUE bank=1 item=1 label=IY code=128 pending=0 buffer_bytes=9
+QUEUE bank=1 item=10 label=OW code=137 pending=0 buffer_bytes=10
+STOP
+OW
+STOP
+IY
+STOP
+OW
+STOP
+IY
+STOP
+OW
+STOP
+IY
+STOP
+OW
+STOP
+IY
+STOP
+OW
+STOP
+RESULT bank=1 item=1 label=IY status=done blocks=319 avg_us=5458 peak_us=6207 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 code=128 mode=queue
+PLAY bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG mode=queue
+THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
+STOP
+RESULT bank=0 item=6 label=THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG status=cut blocks=8 avg_us=6655 peak_us=7194 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=queue
+FRAME SAM:-
+PLAY bank=0 item=1 label=HELLO mode=speech
+HELLO
+FRAME SAM:/H
+FRAME SAM:AX
+FRAME SAM:L
+FRAME SAM:OW
+FRAME SAM:-
+STOP
+RESULT bank=0 item=1 label=HELLO status=done blocks=77 avg_us=5510 peak_us=6701 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech
+RESULT bank=10 item=1 label=RAW status=done blocks=410 avg_us=5726 peak_us=7441 budget_us=7974 late_blocks=0 underrun_events=0 underrun_samples=0 mode=speech

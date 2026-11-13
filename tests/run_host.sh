@@ -16,3 +16,10 @@ fi
 "$test_build/live"
 "$cc" -std=c99 $test_flags tests/upstream_test.c -lm -o "$test_build/upstream"
 "$test_build/upstream"
+
+"$cc" -std=c99 $test_flags tests/performance_test.c -lm -o "$test_build/performance"
+"$test_build/performance"
+"$cxx" -std=c++17 $test_flags tests/dsp_test.cpp src/dsp.cpp -o "$test_build/dsp"
+"$test_build/dsp"
+"$cxx" -std=c++17 $test_flags -Itests/stubs tests/panel_test.cpp -o "$test_build/panel"
+"$test_build/panel"

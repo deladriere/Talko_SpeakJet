@@ -331,6 +331,9 @@ struct sj_chip {
   bool speaking;
   uint32_t retired_bytes, held_position, tick_position;
   uint8_t held_code, tick_code;
+  uint16_t panel_pitch, panel_rate, sequence_phase;
+  int interpolation_ticks;
+  float interpolation_inverse;
 
   struct sj_chip *join_scratch; /* allocated once, never on the audio stack */
 
@@ -416,6 +419,7 @@ static void reset_controls(sj_chip *sj) {
 void sj_power_on(sj_chip *sj) {
   memset(sj, 0, offsetof(sj_chip, join_scratch));
   reset_controls(sj);
+  sj->panel_pitch = sj->panel_rate = 256;
   sj->pending_code = -1;
   sj->rnd = 0x12345678u;
 #ifdef SJ_TUNE
@@ -571,6 +575,19 @@ void sj_set_controls(sj_chip *sj, const sj_controls *c) {
   sj->pending_code = c->pending_code >= 0 && c->pending_code < 256 && sj_command_size((uint8_t)c->pending_code) == 2 ? c->pending_code : -1;
 }
 
+/* Panel performance scaling is independent of queued MSA commands. Rate
+ * advances the allophone sequencer, while oscillator time and output stay at
+ * the native sample rate. Thus slow speech does not lower vocal pitch. */
+void sj_set_performance(sj_chip *sj, uint16_t pitch_q8, uint16_t rate_q8) {
+  sj->panel_pitch = pitch_q8 < 64 ? 64 : pitch_q8 > 1024 ? 1024 : pitch_q8;
+  sj->panel_rate = rate_q8 < 64 ? 64 : rate_q8 > 1024 ? 1024 : rate_q8;
+}
+static float performance_pitch(const sj_chip *sj) {
+  if (sj->panel_pitch == 256) return sj->pitch;
+  const float hz = sj->pitch * (sj->panel_pitch / 256.0f);
+  return hz > 255.0f ? 255.0f : hz;
+}
+
 /* ------------------------------------------------------------- the MSA ---- */
 
 /* the length of a sound at the current Speed, as a factor on its length at
@@ -647,7 +664,10 @@ static inline float sj_sin2pi(float x) {
 /* Keep accumulated float phase bounded over long effects and repeats. */
 static float advance_phase(float phase, float step) {
   float next = phase + step;
-  return next >= 1.0f || next < 0.0f ? next - floorf(next) : next;
+  if (next >= 0.0f && next < 1.0f) return next;
+  if (next >= 1.0f && next < 2.0f) return next - 1.0f;
+  if (next < 0.0f && next >= -1.0f) return next + 1.0f;
+  return next - floorf(next);
 }
 
 /* the master volume: measured on AW, 16 to 127 is only 6 dB */
@@ -1711,7 +1731,7 @@ static float output_stage(sj_chip *sj, float v, bool voice) {
   /* the output stage's nonlinearity and its step size */
   v += T.dist2 * v * v + T.dist3 * v * v * v;
   if (T.quant > 0)
-    v = floorf(v * T.quant + 0.5f) / T.quant;
+    v = floorf(v * T.quant + 0.5f) * (1.0f / T.quant);
   /* the output noise floor: white under the effects' tones; none under the
    * voice (T.floor 0, the chip's voice is exactly periodic) */
   {
@@ -1766,7 +1786,7 @@ static float scp_tick(sj_chip *sj) {
       case 2: env = x; break;
       case 3: env = x < 0.5f ? 1.0f : 0.0f; break;
       default:
-        env = age < T.env_rise ? (float)age / T.env_rise : 1.0f - (float)(age - T.env_rise) / T.env_fall;
+        env = age < T.env_rise ? (float)age * (1.0f / T.env_rise) : 1.0f - (float)(age - T.env_rise) * (1.0f / T.env_fall);
         if (env < 0.0f)
           env = 0.0f;
       }
@@ -1781,7 +1801,7 @@ static float scp_tick(sj_chip *sj) {
       else
         s45 += a * sj_sin2pi(sj->sph[k]);
     }
-    float step = f / NOMINAL;
+    float step = f * (1.0f / NOMINAL);
     if (k >= 3 && sj->reg[6] > 0)
       step *= 1.0f + sj->reg[6] / 255.0f * 2.0f * rnd(sj);
     sj->sph[k] = advance_phase(sj->sph[k], step);
@@ -1815,7 +1835,11 @@ static float tick(sj_chip *sj) {
   sj->tick_code = (uint8_t)(peek(sj, 0) >= 128 ? peek(sj, 0) : 0);
   sj->tick_position = sj->retired_bytes;
   const segment *s = &sj->seg[sj->cur];
-  const float t = s->ticks > 1 ? (float)sj->tick / (s->ticks - 1) : 1.0f;
+  if (sj->interpolation_ticks != s->ticks) {
+    sj->interpolation_ticks = s->ticks;
+    sj->interpolation_inverse = s->ticks > 1 ? 1.0f / (s->ticks - 1) : 0.0f;
+  }
+  const float t = s->ticks > 1 ? sj->tick * sj->interpolation_inverse : 1.0f;
   frame f;
   for (int k = 0; k < 3; k++) {
     const float fa = s->from.f[k], fb = s->to.f[k];
@@ -1841,7 +1865,7 @@ static float tick(sj_chip *sj) {
       for (int k = 0; k < 3; k++) sj->xa[k] = f.a[k];
     for (int k = 0; k < 3; k++) {
       const bool onoff = f.a[k] < 0.5f || sj->xa[k] < 0.5f || (sj->xa[k] < f.a[k] * 0.5f && sj->xa[k] < 2.0f);
-      sj->xa[k] = onoff ? sj->xa[k] + (f.a[k] - sj->xa[k]) / 24.0f : f.a[k];
+      sj->xa[k] = onoff ? sj->xa[k] + (f.a[k] - sj->xa[k]) * (1.0f / 24.0f) : f.a[k];
       f.a[k] = sj->xa[k];
     }
   } else
@@ -1858,7 +1882,7 @@ static float tick(sj_chip *sj) {
     if (!(s->flags & FX_SMOOTH) || sj->stick == 0)
       sj->xv = want;
     else
-      sj->xv += want > sj->xv ? (want - sj->xv) / 24.0f : want - sj->xv;
+      sj->xv += want > sj->xv ? (want - sj->xv) * (1.0f / 24.0f) : want - sj->xv;
   }
   if (s->voiced && sj->pitch > 0) {
     if (sj->ptick <= 0) {
@@ -1870,7 +1894,7 @@ static float tick(sj_chip *sj) {
        * at Pitch plus the part's offset (C1, C2, C3, C6, C7: the same offset at
        * Pitch 60, 88 and 150 on both units, gliding within the part) */
       /* the offset from integers and one division, so every compiler gets the same period */
-      float rate = sj->pitch + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
+      float rate = performance_pitch(sj) + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
       if (rate < 10.0f)
         rate = 10.0f;
       /* the voice counts a 16-bit phase up by floorf(rate * 65536 / 8000) a tick: floorf(65536 / step) + 1 ticks
@@ -1899,7 +1923,7 @@ static float tick(sj_chip *sj) {
     case FX_TRI: env = x; break; /* VoxProbe 7, both units: a rising ramp, then straight back to nothing */
     case FX_SQUARE: env = x < 0.5f ? 1.0f : 0.0f; break;
     default:
-      env = age < T.env_rise ? (float)age / T.env_rise : 1.0f - (float)(age - T.env_rise) / T.env_fall;
+      env = age < T.env_rise ? (float)age * (1.0f / T.env_rise) : 1.0f - (float)(age - T.env_rise) * (1.0f / T.env_fall);
       if (env < 0.0f)
         env = 0.0f;
     }
@@ -1908,7 +1932,7 @@ static float tick(sj_chip *sj) {
     float sum = 0.0f;
     for (int k = 0; k < nf; k++) {
       sum += f.a[k] * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) / NOMINAL);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) * (1.0f / NOMINAL));
     }
     /* mixer 1's limit: the manual says the three volumes must total 63 or
      * less; past it the sum clips */
@@ -1918,7 +1942,7 @@ static float tick(sj_chip *sj) {
     sj->venv = env;
     for (int k = nf; k < 3; k++) {
       v += f.a[k] / 128.0f * 0.6f * f.lv * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) / NOMINAL);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + T.jitter * 2.0f * rnd(sj)) * (1.0f / NOMINAL));
     }
     sj->ptick--;
   } else {
@@ -1931,7 +1955,7 @@ static float tick(sj_chip *sj) {
     for (int k = 0; k < 3; k++) {
       if (f.f[k] > 0.0f && f.a[k] > 0.0f)
         v += f.a[k] / 128.0f * 0.6f * f.lv * sj_sin2pi(sj->phase[k]);
-      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + (s->flags & FX_WANDER ? sj->wander : 0.0f)) / NOMINAL);
+      sj->phase[k] = advance_phase(sj->phase[k], f.f[k] * (1.0f + (s->flags & FX_WANDER ? sj->wander : 0.0f)) * (1.0f / NOMINAL));
     }
     v *= 1.0f + sj->am * (s->flags & FX_WANDER ? 1.0f : AM_STEADY / AM_DEPTH); /* the full wobble only on a wandering part (M0) */
   }
@@ -1964,7 +1988,7 @@ static float tick(sj_chip *sj) {
         sj->bzclk = vper;
       ex = sj->bzclk == vper ? sqrtf(vper / 12.0f) : 0.0f;
       sj->bzclk--;
-      float rate = sj->pitch + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
+      float rate = performance_pitch(sj) + s->pa + (s->ticks > 1 ? (float)((s->pb - s->pa) * sj->tick) / (s->ticks - 1) : s->pb - s->pa);
       if (rate < 10.0f)
         rate = 10.0f;
       int per = (int)ceilf(8000.0f / rate);
@@ -2029,7 +2053,10 @@ static float tick(sj_chip *sj) {
       v += sj->fxburst * sj->fxblp * (1.0f - (float)sj->stick / TICKS(sj->fxbms));
     }
   }
-  sj->stick++;
+  sj->sequence_phase += sj->panel_rate;
+  const int sequence_step = sj->sequence_phase >> 8;
+  sj->sequence_phase &= 255;
+  sj->stick += sequence_step;
 
   /* the effect's peaking filters (transposed direct form II) */
   for (int k = 0; k < sj->neq; k++) {
@@ -2040,8 +2067,9 @@ static float tick(sj_chip *sj) {
   }
   v = output_stage(sj, v, s->voiced && !(s->flags & (FX_VOICED | FX_PULSED)));
 
-  if (++sj->tick >= s->ticks) {
-    sj->tick = 0;
+  sj->tick += sequence_step;
+  while (sj->sounding && sj->tick >= sj->seg[sj->cur].ticks) {
+    sj->tick -= sj->seg[sj->cur].ticks;
     if (++sj->cur >= sj->nseg) {
       if (sj->copies > 0) {
         sj->copies--;

@@ -1,0 +1,23 @@
+{
+  "low": {
+    "fundamental_hz": 21.984047856430706,
+    "peak_dbfs": -23.472397560784152,
+    "rate": 44100,
+    "lag_samples": 2006,
+    "method": "autocorrelation of sustained IY; expected octave range constrained"
+  },
+  "noon": {
+    "fundamental_hz": 87.15415019762845,
+    "peak_dbfs": -24.624897345158473,
+    "rate": 44100,
+    "lag_samples": 506,
+    "method": "autocorrelation of sustained IY; expected octave range constrained"
+  },
+  "high": {
+    "fundamental_hz": 250.5681818181818,
+    "peak_dbfs": -24.99849199481288,
+    "rate": 44100,
+    "lag_samples": 176,
+    "method": "autocorrelation of sustained IY; expected octave range constrained"
+  }
+}
