@@ -1,9 +1,0 @@
-{
-  "product": "Talko_SpeakJet 0.9.3",
-  "serial": "E6647C74032B9C24",
-  "port": "/dev/cu.usbmodem23401",
-  "uf2_sha256": "a20c2f89210e69739c0cee735de9fa85ec9c1e6dde8f109c7cbdf55db51afeab",
-  "readback": "verified",
-  "playback_tests": "not run",
-  "serial_commands": "none; normal serial remains labels only"
-}

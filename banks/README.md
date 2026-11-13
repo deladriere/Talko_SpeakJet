@@ -1,63 +1,85 @@
-# Talko_SpeakJet bank catalogue
+# Bank catalogue
 
-`catalogue.json` is the editable source for fourteen banks. Curated banks 0–6
-each contain 16 entries. The original Emy groups follow at 7–13, displayed as
-7, 8, 9, A, b, C and d. SOUND/CV scans entries in the listed order. Keep these
-seven groups separate and in their original order and ranges:
+The display uses 0–9, then A, b, C and d. Serial commands use decimal bank
+numbers 0–13 and entry numbers starting at 1. SOUND/CV scans each row left to
+right. There are 16 entries per curated bank.
 
-| Display | Group | Native range | Entries |
-|---|---|---|---:|
-| 7 | Vowels | 128–139 | 12 |
-| 8 | Voiced | 128–181 | 54 |
-| 9 | Voiced Stop | 170–181 | 12 |
-| A | Voiceless | 182–199 | 18 |
-| b | All | 128–199 | 72 |
-| C | All Effects | 200–254 | 55 |
-| d | DTMF | 240–251 | 12 |
+## Words, syllables and numbers
 
-Regenerate with:
+### 0 — Robot essentials
+
+HELLO, READY, ROBOT, DANGER, TALKO, YES, NO, OKAY, GO, STOP, WAIT, ERROR, WARNING, WELCOME, THANK YOU, GOODBYE.
+
+### 1 — Performance commands
+
+START, STOP, PLAY, PAUSE, RECORD, ERASE, LOOP, REPEAT, FASTER, SLOWER, HIGHER, LOWER, FORWARD, REVERSE, HOLD, RELEASE.
+
+### 2 — Synth laboratory
+
+SIGNAL, VOLTAGE, CURRENT, CIRCUIT, PULSE, CLOCK, WAVE, NOISE, FILTER, FREQUENCY, TRIGGER, GATE, RHYTHM, SEQUENCE, TEMPO, FEEDBACK.
+
+### 3 — Space
+
+SPACE, TIME, ORBIT, PLANET, STAR, MOON, SUN, MARS, VENUS, SATURN, COSMIC, GALAXY, ALIEN, ROCKET, RADAR, LASER.
+
+### 4 — Rhythmic syllables
+
+BA, BE, BI, BO, BU, MA, ME, MI, MO, MU, TA, TE, TI, TO, TU, SHH.
+
+### 5 — Numbers
+
+ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN.
+
+### 6 — Short transmissions
+
+ARE YOU READY, SYSTEM ONLINE, SYSTEM FAILURE, ACCESS DENIED, HELLO HUMAN, WE ARE ROBOTS, MAKE SOME NOISE, FOLLOW THE RHYTHM, LOST IN SPACE, TAKE ME HOME, DO NOT PANIC, THANK YOU, GOOD MORNING, SEE YOU LATER, TRANSMISSION ENDED, END OF LINE.
+
+## Original Emy groups
+
+Keep all seven groups separate, in this order. Their overlapping ranges are
+intentional.
+
+| Display | Serial bank | Group | Native range | Entries |
+|---|---:|---|---|---:|
+| 7 | 7 | Vowels | 128–139 | 12 |
+| 8 | 8 | Voiced | 128–181 | 54 |
+| 9 | 9 | Voiced Stop | 170–181 | 12 |
+| A | 10 | Voiceless | 182–199 | 18 |
+| b | 11 | All | 128–199 | 72 |
+| C | 12 | All Effects | 200–254 | 55 |
+| d | 13 | DTMF | 240–251 | 12 |
+
+## Editing
+
+Edit [catalogue.json](catalogue.json), then regenerate the compiled header:
 
 ```sh
 python3 scripts/generate_banks.py
 python3 scripts/generate_banks.py --check
+SANITIZE=1 sh tests/run_host.sh
 ```
 
-The generated `src/banks_generated.h` contains the byte arrays, entry tables,
-startup number table and bank map. Never edit it directly. The generator uses
-the vendored engine's actual mnemonic table, rejects unknown tokens, checks
-all curated bank sizes and requires each entry to fit the native 64-byte FIFO.
-Host tests check that the generated header matches this catalogue.
+Commands run from the repository root. Do not edit `src/banks_generated.h`
+directly. The generator checks bank order, 16-entry curated banks, all Emy
+ranges, known mnemonics, startup digit order and the 64-byte native FIFO limit.
+The numbers bank uses `role: numbers`; its first ten labels must remain ZERO–NINE.
 
-New word pronunciations were selected from the user's existing
-`SpeakJet_vox/SD/cmudict.txt`, a CMU-derived dictionary already converted to
-SpeakJet mnemonics. Its SHA-256 is stored in the catalogue. Only selected
-phoneme strings are stored here: the 5 MB dictionary is not loaded onto Talko
-and is not needed to regenerate this snapshot. See the
-[CMU dictionary notice](CMUDICT-LICENSE), copied from the
-[upstream notice](https://github.com/cmusphinx/cmudict/blob/master/LICENSE).
+Each entry contains a readable uppercase `label`, exactly one of `phonemes`
+(mnemonics, with P0–P6 when needed) or `bytes` (native bytes), and its `source`.
+Document manual pronunciation changes in that source field.
 
-Entries with `source: cmudict: ...` use the default pronunciation of each named
-word. Consecutive repeated vowels are retained. Multiword entries insert P4
-(the engine's short native pause) between words. They add no speed, pitch,
-volume or bend commands, so a word cannot unexpectedly change the next queued
-word's controls. Pronunciation is an approximation inherited from the local
-conversion; listening and manual adjustments are appropriate when refining it.
+## Pronunciation sources
 
-HELLO, READY, ROBOT, DANGER, TALKO and ZERO through NINE preserve the exact
-0.9.1 byte sequences. Rhythmic syllables are curated open syllables with no
-inserted pause: A/E/I/O/U use AW/EH/IY/OW/UW. BA/BO/BU use BO; BE/BI use BE.
-TA/TO/TU use TU; TE/TI use TT. The M series uses MM; SHH uses SH. These short
-entries are intended for live Queue blending rather than dictionary spelling.
+New vocabulary was selected from the existing CMU-derived SpeakJet mnemonic
+dictionary `SpeakJet_vox/SD/cmudict.txt`; its SHA-256 is recorded in the catalogue.
+Only selected phoneme strings are compiled. The full dictionary is not required
+to build or regenerate this snapshot. See the [CMU notice](CMUDICT-LICENSE).
 
-To add or refine an entry, keep its readable uppercase label, then supply
-exactly one of `phonemes` (mnemonics, including P0–P6 where needed) or `bytes`
-(native byte stream). Keep 16 entries in each curated bank and preserve the
-first ten entries of `spokenDigits` in numeric order: startup uses them too.
-Document the source for every manual override and run the generator and host
-suite after editing.
+Dictionary entries retain consecutive repeated vowels and insert P4 between
+words, without changing queued speed, pitch, volume or bend. HELLO, READY,
+ROBOT, DANGER, TALKO and ZERO–NINE preserve their original byte streams.
 
-Bank 5 now holds ZERO–FIFTEEN and is marked `role: numbers` in the catalogue.
-The generator uses that role for the startup table rather than a fixed bank
-number. It checks the first ten spoken labels remain ZERO–NINE in order.
-All seven Emy groups are enforced by generation checks. The long pangram is
-absent; overlapping native groups are intentional and must be preserved.
+Rhythmic syllables add no pause. A/E/I/O/U use AW/EH/IY/OW/UW; BA/BO/BU use BO,
+BE/BI use BE, TA/TO/TU use TU, TE/TI use TT, and the M series uses MM. SHH uses SH.
+These short sequences are intended for live Queue blending. The old pangram is
+not part of the catalogue.

@@ -1,1 +1,15 @@
+# Build and editor files
 .pio/
+.vscode/
+.DS_Store
+__pycache__/
+*.py[cod]
+
+# Local diagnostics and archived work
+/reports/
+/validation/
+/.local-archive/
+
+# Release images live under firmware/
+/Talko_SpeakJet-*.uf2
+/Talko_SpeakJet-*.uf2.sha256

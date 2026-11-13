@@ -2,7 +2,7 @@ from pathlib import Path
 import serial,serial.tools.list_ports,time,re,json,sys,argparse
 parser=argparse.ArgumentParser()
 parser.add_argument("--serial-id",required=True)
-parser.add_argument("--output",type=Path,default=Path("validation/0.9.3"))
+parser.add_argument("--output",type=Path,default=Path("reports/0.9.3"))
 parser.add_argument("--quick",action="store_true")
 args=parser.parse_args()
 out=args.output;out.mkdir(parents=True,exist_ok=True)
