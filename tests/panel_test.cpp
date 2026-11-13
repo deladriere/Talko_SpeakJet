@@ -45,9 +45,9 @@ int main(){
   testPins[0]=false;advance(12);assert(observed.error);assert(testPwm[12]==100);
   testPins[0]=true;advance(12);assert(!observed.error);
   testPins[13]=false;advance(12);testPins[13]=true;advance(12);assert(!fxPage && testPwm[12]==0);
-  bankCursor=8;for(unsigned state:{1u,0u,2u,3u}){testPins[3]=state&2;testPins[4]=state&1;encoderInterrupt();}
-  assert(bankCursor==8);
+  bankCursor=BankCount-1;for(unsigned state:{1u,0u,2u,3u}){testPins[3]=state&2;testPins[4]=state&1;encoderInterrupt();}
+  assert(bankCursor==BankCount-1);
   for(unsigned state:{2u,0u,1u,3u}){testPins[3]=state&2;testPins[4]=state&1;encoderInterrupt();}
-  assert(bankCursor==7);
+  assert(bankCursor==BankCount-2);
   puts("Actual panel loop: three switch positions, gate cuts, queued selections, all ADCs, FX page, ERROR and bank reversal OK");
 }

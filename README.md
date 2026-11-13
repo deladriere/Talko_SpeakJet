@@ -1,25 +1,24 @@
-# Talko_SpeakJet 0.9.1
+# Talko_SpeakJet 0.9.2
 
 SpeakJet firmware for the **Talko 2 (RP2040)**. It brings the Emy-style
-banks of vowels, allophones and effects to Talko, along with a bank of spoken
-digits. In Queue mode, closely spaced triggers can blend phonemes into a
+banks of vowels, allophones and effects to Talko, with curated words, phrases, rhythmic syllables and spoken numbers. In Queue mode, closely spaced triggers can blend phonemes into a
 continuous voice.
 
-At startup, SpeakJet says “zero point nine point one” as the front display shows
+At startup, SpeakJet says “zero point nine point two” as the front display shows
 `0`, the dot, then `9`. The rear LED flashes blue once and green nine
-times. A second dot/blue separator and one green flash announce the patch `1`.
+times. A second dot/blue separator and two green flashes announce the patch `2`.
 Red flashes count the major version when it is above zero.
 
 ## Install and play
 
 1. Connect Talko with a USB data cable. Hold **BOOTSEL**, press and release
    **RESET**, then release **BOOTSEL** when the `RPI-RP2` drive appears.
-2. Copy [Talko_SpeakJet-0.9.1.uf2](Talko_SpeakJet-0.9.1.uf2) to that drive.
+2. Copy [Talko_SpeakJet-0.9.2.uf2](Talko_SpeakJet-0.9.2.uf2) to that drive.
    Talko restarts automatically.
 3. Move the switch **left**, turn the encoder to bank **0**, and turn
    **SOUND** fully counterclockwise. Press **SPEAK** to hear **HELLO**.
 4. Try bank **8** for spoken numbers. SOUND selects **ZERO** at the left end
-   and **NINE** at the right end.
+   and **FIFTEEN** at the right end.
 
 | Control | Action |
 |---|---|
@@ -57,20 +56,33 @@ uses the stock irregular brightness flicker while preserving the FX-page dot.
 
 ## Banks
 
-SOUND scans each row from left to right. Banks 1–7 follow the SpeakJet code
-ranges used by Emy.
+Ten banks fill the front display's **0–9** range. SOUND/CV scans each row from
+left to right. Curated banks have **16 entries**: approximately 6.25% of the
+usable SOUND range per entry. Native vowels, allophones and chip sounds retain
+their full ranges. The long pangram has been removed.
 
 | Display | Bank | Entries | SOUND order |
 |---|---|---:|---|
-| 0 | Words and test sentence | 6 | HELLO, READY, ROBOT, DANGER, TALKO, THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG |
+| 0 | Robot essentials | 16 | HELLO, READY, ROBOT, DANGER, TALKO, YES, NO, OKAY, GO, STOP, WAIT, ERROR, WARNING, WELCOME, THANK YOU, GOODBYE |
 | 1 | Vowels | 12 | Codes 128–139 |
-| 2 | Voiced allophones | 54 | Codes 128–181 |
-| 3 | Voiced stops | 12 | Codes 170–181 |
-| 4 | Voiceless allophones | 18 | Codes 182–199 |
+| 2 | Performance commands | 16 | START, STOP, PLAY, PAUSE, RECORD, ERASE, LOOP, REPEAT, FASTER, SLOWER, HIGHER, LOWER, FORWARD, REVERSE, HOLD, RELEASE |
+| 3 | Synth laboratory | 16 | SIGNAL, VOLTAGE, CURRENT, CIRCUIT, PULSE, CLOCK, WAVE, NOISE, FILTER, FREQUENCY, TRIGGER, GATE, RHYTHM, SEQUENCE, TEMPO, FEEDBACK |
+| 4 | Space | 16 | SPACE, TIME, ORBIT, PLANET, STAR, MOON, SUN, MARS, VENUS, SATURN, COSMIC, GALAXY, ALIEN, ROCKET, RADAR, LASER |
 | 5 | All allophones | 72 | Codes 128–199 |
-| 6 | SpeakJet effects | 55 | Codes 200–254, including robot sounds, alarms, beeps, biological sounds and DTMF |
-| 7 | DTMF telephone tones | 12 | 0–9, star, pound (codes 240–251) |
-| 8 | Spoken digits | 10 | ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE |
+| 6 | Chip sounds | 55 | Codes 200–254; includes robot sounds, alarms, beeps, biological sounds and DTMF |
+| 7 | Rhythmic syllables | 16 | BA, BE, BI, BO, BU, MA, ME, MI, MO, MU, TA, TE, TI, TO, TU, SHH |
+| 8 | Numbers | 16 | ZERO, ONE, TWO, THREE, FOUR, FIVE, SIX, SEVEN, EIGHT, NINE, TEN, ELEVEN, TWELVE, THIRTEEN, FOURTEEN, FIFTEEN |
+| 9 | Short transmissions | 16 | ARE YOU READY, SYSTEM ONLINE, SYSTEM FAILURE, ACCESS DENIED, HELLO HUMAN, WE ARE ROBOTS, MAKE SOME NOISE, FOLLOW THE RHYTHM, LOST IN SPACE, TAKE ME HOME, DO NOT PANIC, THANK YOU, GOOD MORNING, SEE YOU LATER, TRANSMISSION ENDED, END OF LINE |
+
+Bank **7** is designed for rhythmic Queue patches. Turn SPEED down, send a
+clock and scan BA–BU, MA–MU and TA–TU with SOUND/CV; the syllables have no added
+pause. SHH at the clockwise end adds a noise accent. Bank **9** holds complete
+short phrases. DTMF remains available inside bank **6**.
+
+The editable [bank catalogue](banks/catalogue.json) stores just the selected
+pronunciations, derived from the supplied CMU/SpeakJet dictionary. HELLO, READY,
+ROBOT, DANGER, TALKO and ZERO–NINE keep their existing byte streams. See
+[bank generation and pronunciation notes](banks/README.md) to change content.
 
 For the swept-noise test, select bank **6** and turn SOUND about **70%**
 clockwise. This selects **BIO_8** (item 39, SpeakJet **C8**). Fully clockwise
@@ -79,7 +91,7 @@ selects **WOW** (SpeakJet **M2**).
 ## USB serial
 
 Open PlatformIO Monitor or another serial terminal at **115200 baud** before
-playing. On macOS, look for a `/dev/cu.usbmodem…` port. The USB device name is **Talko_SpeakJet 0.9.1** (manufacturer Polaxis).
+playing. On macOS, look for a `/dev/cu.usbmodem…` port. The USB device name is **Talko_SpeakJet 0.9.2** (manufacturer Polaxis).
 The connection banner shows firmware/engine versions and `build=normal`.
 Normal operation sends readable speech labels and STOP; timing and repeated
 panel snapshots are enabled only by explicit serial commands.
@@ -123,34 +135,28 @@ a serial port.
 The emulator is adapted from Andrew Davie's
 [SpeakJet 0.4.3](https://github.com/andrew-davie/SpeakJet/tree/ea2935018ed8ee90becb28b48fc2c83d03f683fe).
 The library source carries its [MIT license and upstream notices](lib/SpeakJet/LICENSE).
-The bank 0 phrases were generated with upstream `text2speakjet` using
-`--no-phrasealator`. The bank ranges, spoken digits and effect labels come
-from Polaxis Emy's SpeakJet firmware.
+The five original bank-0 words were generated with upstream `text2speakjet`
+using `--no-phrasealator`; their byte streams are retained. New vocabulary comes
+from the user's CMU-derived SpeakJet dictionary; the catalogue records its
+SHA-256. Selected phoneme strings are compiled into flash, without storing or
+loading the full dictionary. See the [CMU notice](banks/CMUDICT-LICENSE).
+Native effect labels and ZERO–NINE come from Polaxis Emy's SpeakJet firmware.
 
 ## Verification
 
-Talko_SpeakJet 0.9.1 builds for RP2040. The normal image has been flashed,
-readback-verified and left installed. The user confirmed PITCH, FX, ERROR and
-all switch modes working on the instrument. Host tests exercise the actual
-panel loop with simulated GPIO/ADC input, native slow phoneme joining, pitch
-independent of duration, FX dry/switch behavior and ERROR loop playback.
+The normal 0.9.2 image has been flashed, readback-verified and checked for its
+USB identity. All 251 entries and the existing panel,
+Queue, FX and ERROR host tests pass with sanitizers. On-device sound and control
+testing is left to the user, as requested. See the [0.9.2 test record](validation/0.9.2/README.md).
+The normal build has the new banks, USB/startup version and no test-input override.
+Run `SANITIZE=1 sh tests/run_host.sh` for the host suite, including generated-bank
+consistency, every selection, native joining, independent pitch/rate, panel
+behavior, FX and ERROR.
 
-The final normal-image scan completed **262 streams**, including every bank
-selection, transitions, live Queue and serial-disconnected playback, with
-**zero underruns**. Two blocks exceeded the 7,974 µs deadline; the maximum was
-8,206 µs and buffering covered both. The separate diagnostic build measured
-pitch, rate, all eight FX choices, native FIFO filling and ERROR with zero late
-blocks or underruns. A 1 ms panel/USB update interval prevents the CPU contention
-found in the first control candidate; gate and encoder interrupts still capture
-edges between updates.
-
-See [the 0.9.1 validation record](validation/0.9.1/README.md) for exact images,
-measurements, the earlier failing tests and limits. Run
-`SANITIZE=1 sh tests/run_host.sh` for the full host suite with
-address/undefined-behavior checks.
-
-The [0.9 validation archive](validation/0.9/README.md) documents the earlier
-engine-only prototype; it did not validate physical panel controls.
+The [0.9.1 validation archive](validation/0.9.1/README.md) records the working
+performance controls and the 1 ms panel/USB scheduling fix. Preserve that update
+interval during future changes: an unrestricted core-0 loop caused underruns.
+The [0.9 archive](validation/0.9/README.md) covers the earlier engine prototype.
 
 ### Historical checks
 
@@ -172,7 +178,7 @@ sweep optimization introduced in 0.5.
 
 ## Talko-specific implementation: preserve during upstream updates
 
-The Talko firmware version (currently **Talko_SpeakJet 0.9.1**) is separate
+The Talko firmware version (currently **Talko_SpeakJet 0.9.2**) is separate
 from the embedded SpeakJet engine version (**0.4.3**). This is a maintained
 RP2040 port, not an unmodified copy of the desktop emulator.
 
@@ -188,7 +194,7 @@ RP2040 port, not an unmodified copy of the desktop emulator.
 | PWM output | GPIO 1 carries PWM at 12 carrier periods per audio sample. The interrupt only consumes prepared duties; synthesis stays outside interrupts. |
 | Live joining | `sj_join_pending()` revisits a phoneme's tail after appending live input between render blocks. A reusable scratch planner rebuilds the sound with the newly available context and accepts it only when the rendered past is unchanged. Late arrivals and explicit Repeat-command copies remain separate. This API is a Talko addition. |
 | Stream cancellation | Epoch-based gate cuts invalidate playing and waiting requests. The pending selection queue has 16 slots; a full queue reports `DROP`. |
-| Instrument identity | Nine Emy-style banks, the existing allophone/effect byte order, Emy effect labels and spoken digits, and the six bank-0 phrases. Preserve these byte streams during an engine-only update. |
+| Instrument identity | Ten banks with the curated words/phrases, native allophone/effect byte order, Emy effect labels and preserved startup digits. Preserve their byte streams during an engine-only update. |
 | Panel behavior | Settled quadrature inputs on GPIO 3/4; SOUND/FX/SPEED/PITCH on ADC GPIO 26/27/28/29; ERROR on GPIO 0; encoder press on 13; inverted GATE/SPEAK on 2; switch 14/15; display 5–12 at brightness 100. Speech/Gate/Queue use distinct retrigger/cutoff policies. |
 | Startup | `talko_startup.h` and `ws2812.pio.h`: spoken version synchronized with the front display, rear RGB LED on GPIO 16, and bank-page decimal point off. |
 | Live performance | `sj_set_performance()` applies Q8 pitch/rate ratios. Rate advances allophone/frame timing; oscillator/output time remains native-rate. Preserve native command streams and transition planning. The interpolation reciprocal is cached, constant hot-loop divisions use reciprocals, and the phase wrap uses a fast bounded path. |
@@ -203,7 +209,9 @@ RP2040 port, not an unmodified copy of the desktop emulator.
 - `src/dsp.h` / `dsp.cpp`: fixed-point FX and ERROR history loop, owned by core 1.
 - `src/audio.cpp` / `audio.h`: core ownership, ring buffer, PWM, stream modes,
   cancellation, startup speech, serial reports and Talko version.
-- `src/banks.h`: immutable selections, phrase bytes, digit dictionary and Emy labels.
+- `banks/catalogue.json`: editable selections, pronunciations and source provenance.
+- `scripts/generate_banks.py`: validates the catalogue and generates the bank header.
+- `src/banks.h` / `banks_generated.h`: entry helpers, compiled selections, startup numbers and Emy labels.
 - `src/talko_startup.h` / `ws2812.pio.h`: display and rear LED startup sequence.
 - `lib/SpeakJet/src/speakjet.c`: adapted engine and Talko's live-join hook.
 - `lib/SpeakJet/src/speakjet_tables.c`: generated upstream sound parameters,
@@ -248,7 +256,7 @@ of upstream's 48 kHz desktop output. Zero measured underruns do not establish
 that every possible patch will meet its deadline.
 
 
-## Developer serial commands (0.9.1)
+## Developer serial commands (0.9.2)
 
 Commands end with a newline. Work is bounded and nonblocking on the panel
 core; playback still obeys the selected request mode.
@@ -276,7 +284,7 @@ For a repeatable device scan, install `pyserial`, close other serial clients,
 identify the Talko's USB serial number, and run:
 
 ```sh
-python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output validation/0.9.1
+python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output validation/0.9.2
 ```
 
 Add `--quick` for selected words/effects and the transition, Queue, cutoff,
@@ -308,7 +316,7 @@ count afterward.
 
 `pio run` builds only the normal `pico` environment. It contains no test-input
 override command and performs no automatic benchmark. The release UF2 and USB
-identity are **Talko_SpeakJet 0.9.1**; its banner says `build=normal`.
+identity are **Talko_SpeakJet 0.9.2**; its banner says `build=normal`.
 
 `pio run -e diagnostic` is a separately labelled developer build containing
 `TEST pitchADC speedADC fxADC effectIndex errorFlag` and `TEST OFF` for controlled
@@ -328,3 +336,13 @@ feedback. Flashing 0.8 does not restore PITCH, FX or ERROR: the earlier panel
 loop did not read those inputs. Its basic switch-mode logic was already present. Keep 0.8 and 0.9 UF2s for rollback. A physical
 control check is required for future releases in addition to serial rendering
 and underrun measurements.
+
+
+### Bank release 0.9.2
+
+The ten-bank catalogue replaces overlapping voiced/stop/voiceless and dedicated
+DTMF banks with performance commands, synth vocabulary, space words and rhythmic
+syllables. Bank 9 adds short transmissions; bank 8 now counts ZERO–FIFTEEN.
+Bank 1 retains 12 vowels, bank 5 all 72 allophones, and bank 6 all 55 chip sounds.
+The renderer, PITCH/SPEED/FX/ERROR controls and native Queue policy remain those
+of the verified 0.9.1 source. Keep its UF2 for rollback.

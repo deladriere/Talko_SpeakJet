@@ -3,6 +3,7 @@ set -eu
 cd "$(dirname "$0")/.."
 test_build=$(mktemp -d "${TMPDIR:-/tmp}/talko-speakjet-host.XXXXXX")
 trap 'rm -rf "$test_build"' EXIT HUP INT TERM
+python3 scripts/generate_banks.py --check
 cc=${CC:-cc}
 cxx=${CXX:-c++}
 test_flags="-O2 -Wall -Wextra -ffp-contract=off"

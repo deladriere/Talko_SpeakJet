@@ -1,0 +1,1374 @@
+{
+  "format": 1,
+  "dictionary": "SpeakJet_vox/SD/cmudict.txt (local CMU-derived SpeakJet mnemonic dictionary)",
+  "dictionary_sha256": "f8dceea132f59f62dfdff3c85df103ba5b7c2ca46e9545b4d8abdf31afd685a2",
+  "word_boundary": "P4, native short pause; syllable entries have no added pause",
+  "banks": [
+    {
+      "id": 0,
+      "name": "Robot essentials",
+      "entries": [
+        {
+          "label": "HELLO",
+          "bytes": [
+            184,
+            7,
+            133,
+            146,
+            14,
+            164
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "READY",
+          "bytes": [
+            148,
+            14,
+            131,
+            174,
+            7,
+            128
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "ROBOT",
+          "bytes": [
+            148,
+            14,
+            164,
+            171,
+            135,
+            191
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "DANGER",
+          "bytes": [
+            174,
+            14,
+            154,
+            141,
+            165,
+            7,
+            151
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "TALKO",
+          "bytes": [
+            192,
+            14,
+            132,
+            195,
+            7,
+            164
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "YES",
+          "phonemes": [
+            "IYEH",
+            "EH",
+            "SE"
+          ],
+          "source": "cmudict: yes"
+        },
+        {
+          "label": "NO",
+          "phonemes": [
+            "NE",
+            "OW",
+            "OW"
+          ],
+          "source": "cmudict: no"
+        },
+        {
+          "label": "OKAY",
+          "phonemes": [
+            "OW",
+            "OW",
+            "KE",
+            "EYIY"
+          ],
+          "source": "cmudict: okay"
+        },
+        {
+          "label": "GO",
+          "phonemes": [
+            "GE",
+            "OW",
+            "OW"
+          ],
+          "source": "cmudict: go"
+        },
+        {
+          "label": "STOP",
+          "phonemes": [
+            "SE",
+            "TT",
+            "AW",
+            "PO"
+          ],
+          "source": "cmudict: stop"
+        },
+        {
+          "label": "WAIT",
+          "phonemes": [
+            "WW",
+            "EYIY",
+            "TT"
+          ],
+          "source": "cmudict: wait"
+        },
+        {
+          "label": "ERROR",
+          "phonemes": [
+            "EH",
+            "RR",
+            "AXRR"
+          ],
+          "source": "cmudict: error"
+        },
+        {
+          "label": "WARNING",
+          "phonemes": [
+            "WW",
+            "AW",
+            "AW",
+            "RR",
+            "NE",
+            "IH",
+            "NGE"
+          ],
+          "source": "cmudict: warning"
+        },
+        {
+          "label": "WELCOME",
+          "phonemes": [
+            "WW",
+            "EH",
+            "LE",
+            "KE",
+            "EY",
+            "MM"
+          ],
+          "source": "cmudict: welcome"
+        },
+        {
+          "label": "THANK YOU",
+          "phonemes": [
+            "DH",
+            "AY",
+            "NGE",
+            "KE",
+            "P4",
+            "IYEH",
+            "UW",
+            "UW"
+          ],
+          "source": "cmudict: thank you"
+        },
+        {
+          "label": "GOODBYE",
+          "phonemes": [
+            "GE",
+            "UH",
+            "UH",
+            "ED",
+            "EB",
+            "OHIH"
+          ],
+          "source": "cmudict: goodbye"
+        }
+      ]
+    },
+    {
+      "id": 1,
+      "name": "Vowels",
+      "native": [
+        128,
+        139
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Performance commands",
+      "entries": [
+        {
+          "label": "START",
+          "phonemes": [
+            "SE",
+            "TT",
+            "AW",
+            "RR",
+            "TT"
+          ],
+          "source": "cmudict: start"
+        },
+        {
+          "label": "STOP",
+          "phonemes": [
+            "SE",
+            "TT",
+            "AW",
+            "PO"
+          ],
+          "source": "cmudict: stop"
+        },
+        {
+          "label": "PLAY",
+          "phonemes": [
+            "PO",
+            "LE",
+            "EYIY"
+          ],
+          "source": "cmudict: play"
+        },
+        {
+          "label": "PAUSE",
+          "phonemes": [
+            "PO",
+            "AW",
+            "AW",
+            "ZZ"
+          ],
+          "source": "cmudict: pause"
+        },
+        {
+          "label": "RECORD",
+          "phonemes": [
+            "RR",
+            "EY",
+            "KE",
+            "AW",
+            "AW",
+            "RR",
+            "ED"
+          ],
+          "source": "cmudict: record"
+        },
+        {
+          "label": "ERASE",
+          "phonemes": [
+            "IH",
+            "RR",
+            "EYIY",
+            "SE"
+          ],
+          "source": "cmudict: erase"
+        },
+        {
+          "label": "LOOP",
+          "phonemes": [
+            "LE",
+            "UW",
+            "UW",
+            "PO"
+          ],
+          "source": "cmudict: loop"
+        },
+        {
+          "label": "REPEAT",
+          "phonemes": [
+            "RR",
+            "IH",
+            "PO",
+            "IY",
+            "IY",
+            "TT"
+          ],
+          "source": "cmudict: repeat"
+        },
+        {
+          "label": "FASTER",
+          "phonemes": [
+            "FF",
+            "AY",
+            "SE",
+            "TT",
+            "AXRR"
+          ],
+          "source": "cmudict: faster"
+        },
+        {
+          "label": "SLOWER",
+          "phonemes": [
+            "SE",
+            "LE",
+            "OW",
+            "OW",
+            "AXRR"
+          ],
+          "source": "cmudict: slower"
+        },
+        {
+          "label": "HIGHER",
+          "phonemes": [
+            "HE",
+            "OHIH",
+            "AXRR"
+          ],
+          "source": "cmudict: higher"
+        },
+        {
+          "label": "LOWER",
+          "phonemes": [
+            "LE",
+            "OW",
+            "OW",
+            "AXRR"
+          ],
+          "source": "cmudict: lower"
+        },
+        {
+          "label": "FORWARD",
+          "phonemes": [
+            "FF",
+            "AW",
+            "AW",
+            "RR",
+            "WW",
+            "AXRR",
+            "ED"
+          ],
+          "source": "cmudict: forward"
+        },
+        {
+          "label": "REVERSE",
+          "phonemes": [
+            "RR",
+            "IH",
+            "VV",
+            "AXRR",
+            "SE"
+          ],
+          "source": "cmudict: reverse"
+        },
+        {
+          "label": "HOLD",
+          "phonemes": [
+            "HE",
+            "OW",
+            "OW",
+            "LE",
+            "ED"
+          ],
+          "source": "cmudict: hold"
+        },
+        {
+          "label": "RELEASE",
+          "phonemes": [
+            "RR",
+            "IY",
+            "LE",
+            "IY",
+            "IY",
+            "SE"
+          ],
+          "source": "cmudict: release"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Synth laboratory",
+      "entries": [
+        {
+          "label": "SIGNAL",
+          "phonemes": [
+            "SE",
+            "IH",
+            "GE",
+            "NE",
+            "EY",
+            "LE"
+          ],
+          "source": "cmudict: signal"
+        },
+        {
+          "label": "VOLTAGE",
+          "phonemes": [
+            "VV",
+            "OW",
+            "OW",
+            "LE",
+            "TT",
+            "EY",
+            "JH"
+          ],
+          "source": "cmudict: voltage"
+        },
+        {
+          "label": "CURRENT",
+          "phonemes": [
+            "KE",
+            "AXRR",
+            "EY",
+            "NE",
+            "TT"
+          ],
+          "source": "cmudict: current"
+        },
+        {
+          "label": "CIRCUIT",
+          "phonemes": [
+            "SE",
+            "AXRR",
+            "KE",
+            "EY",
+            "TT"
+          ],
+          "source": "cmudict: circuit"
+        },
+        {
+          "label": "PULSE",
+          "phonemes": [
+            "PO",
+            "UX",
+            "LE",
+            "SE"
+          ],
+          "source": "cmudict: pulse"
+        },
+        {
+          "label": "CLOCK",
+          "phonemes": [
+            "KE",
+            "LE",
+            "AW",
+            "KE"
+          ],
+          "source": "cmudict: clock"
+        },
+        {
+          "label": "WAVE",
+          "phonemes": [
+            "WW",
+            "EYIY",
+            "VV"
+          ],
+          "source": "cmudict: wave"
+        },
+        {
+          "label": "NOISE",
+          "phonemes": [
+            "NE",
+            "OWIY",
+            "ZZ"
+          ],
+          "source": "cmudict: noise"
+        },
+        {
+          "label": "FILTER",
+          "phonemes": [
+            "FF",
+            "IH",
+            "LE",
+            "TT",
+            "AXRR"
+          ],
+          "source": "cmudict: filter"
+        },
+        {
+          "label": "FREQUENCY",
+          "phonemes": [
+            "FF",
+            "RR",
+            "IY",
+            "IY",
+            "KE",
+            "WW",
+            "EY",
+            "NE",
+            "SE",
+            "IY"
+          ],
+          "source": "cmudict: frequency"
+        },
+        {
+          "label": "TRIGGER",
+          "phonemes": [
+            "TT",
+            "RR",
+            "IH",
+            "GE",
+            "AXRR"
+          ],
+          "source": "cmudict: trigger"
+        },
+        {
+          "label": "GATE",
+          "phonemes": [
+            "GE",
+            "EYIY",
+            "TT"
+          ],
+          "source": "cmudict: gate"
+        },
+        {
+          "label": "RHYTHM",
+          "phonemes": [
+            "RR",
+            "IH",
+            "DH",
+            "EY",
+            "MM"
+          ],
+          "source": "cmudict: rhythm"
+        },
+        {
+          "label": "SEQUENCE",
+          "phonemes": [
+            "SE",
+            "IY",
+            "IY",
+            "KE",
+            "WW",
+            "EY",
+            "NE",
+            "SE"
+          ],
+          "source": "cmudict: sequence"
+        },
+        {
+          "label": "TEMPO",
+          "phonemes": [
+            "TT",
+            "EH",
+            "MM",
+            "PO",
+            "OW",
+            "OW"
+          ],
+          "source": "cmudict: tempo"
+        },
+        {
+          "label": "FEEDBACK",
+          "phonemes": [
+            "FF",
+            "IY",
+            "IY",
+            "ED",
+            "EB",
+            "AY",
+            "KE"
+          ],
+          "source": "cmudict: feedback"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Space",
+      "entries": [
+        {
+          "label": "SPACE",
+          "phonemes": [
+            "SE",
+            "PO",
+            "EYIY",
+            "SE"
+          ],
+          "source": "cmudict: space"
+        },
+        {
+          "label": "TIME",
+          "phonemes": [
+            "TT",
+            "OHIH",
+            "MM"
+          ],
+          "source": "cmudict: time"
+        },
+        {
+          "label": "ORBIT",
+          "phonemes": [
+            "AW",
+            "AW",
+            "RR",
+            "EB",
+            "EY",
+            "TT"
+          ],
+          "source": "cmudict: orbit"
+        },
+        {
+          "label": "PLANET",
+          "phonemes": [
+            "PO",
+            "LE",
+            "AY",
+            "NE",
+            "EY",
+            "TT"
+          ],
+          "source": "cmudict: planet"
+        },
+        {
+          "label": "STAR",
+          "phonemes": [
+            "SE",
+            "TT",
+            "AW",
+            "RR"
+          ],
+          "source": "cmudict: star"
+        },
+        {
+          "label": "MOON",
+          "phonemes": [
+            "MM",
+            "UW",
+            "UW",
+            "NE"
+          ],
+          "source": "cmudict: moon"
+        },
+        {
+          "label": "SUN",
+          "phonemes": [
+            "SE",
+            "UX",
+            "NE"
+          ],
+          "source": "cmudict: sun"
+        },
+        {
+          "label": "MARS",
+          "phonemes": [
+            "MM",
+            "AW",
+            "RR",
+            "ZZ"
+          ],
+          "source": "cmudict: mars"
+        },
+        {
+          "label": "VENUS",
+          "phonemes": [
+            "VV",
+            "IY",
+            "IY",
+            "NE",
+            "EY",
+            "SE"
+          ],
+          "source": "cmudict: venus"
+        },
+        {
+          "label": "SATURN",
+          "phonemes": [
+            "SE",
+            "AY",
+            "TT",
+            "AXRR",
+            "NE"
+          ],
+          "source": "cmudict: saturn"
+        },
+        {
+          "label": "COSMIC",
+          "phonemes": [
+            "KE",
+            "AW",
+            "ZZ",
+            "MM",
+            "IH",
+            "KE"
+          ],
+          "source": "cmudict: cosmic"
+        },
+        {
+          "label": "GALAXY",
+          "phonemes": [
+            "GE",
+            "AY",
+            "LE",
+            "EY",
+            "KE",
+            "SE",
+            "IY"
+          ],
+          "source": "cmudict: galaxy"
+        },
+        {
+          "label": "ALIEN",
+          "phonemes": [
+            "EYIY",
+            "LE",
+            "IY",
+            "EY",
+            "NE"
+          ],
+          "source": "cmudict: alien"
+        },
+        {
+          "label": "ROCKET",
+          "phonemes": [
+            "RR",
+            "AW",
+            "KE",
+            "EY",
+            "TT"
+          ],
+          "source": "cmudict: rocket"
+        },
+        {
+          "label": "RADAR",
+          "phonemes": [
+            "RR",
+            "EYIY",
+            "ED",
+            "AW",
+            "RR"
+          ],
+          "source": "cmudict: radar"
+        },
+        {
+          "label": "LASER",
+          "phonemes": [
+            "LE",
+            "EYIY",
+            "ZZ",
+            "AXRR"
+          ],
+          "source": "cmudict: laser"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "All allophones",
+      "native": [
+        128,
+        199
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Chip sounds",
+      "native": [
+        200,
+        254
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Rhythmic syllables",
+      "entries": [
+        {
+          "label": "BA",
+          "phonemes": [
+            "BO",
+            "AW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "BE",
+          "phonemes": [
+            "BE",
+            "EH"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "BI",
+          "phonemes": [
+            "BE",
+            "IY"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "BO",
+          "phonemes": [
+            "BO",
+            "OW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "BU",
+          "phonemes": [
+            "BO",
+            "UW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "MA",
+          "phonemes": [
+            "MM",
+            "AW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "ME",
+          "phonemes": [
+            "MM",
+            "EH"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "MI",
+          "phonemes": [
+            "MM",
+            "IY"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "MO",
+          "phonemes": [
+            "MM",
+            "OW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "MU",
+          "phonemes": [
+            "MM",
+            "UW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "TA",
+          "phonemes": [
+            "TU",
+            "AW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "TE",
+          "phonemes": [
+            "TT",
+            "EH"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "TI",
+          "phonemes": [
+            "TT",
+            "IY"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "TO",
+          "phonemes": [
+            "TU",
+            "OW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "TU",
+          "phonemes": [
+            "TU",
+            "UW"
+          ],
+          "source": "curated open syllable"
+        },
+        {
+          "label": "SHH",
+          "phonemes": [
+            "SH"
+          ],
+          "source": "curated hiss"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Numbers",
+      "entries": [
+        {
+          "label": "ZERO",
+          "bytes": [
+            167,
+            7,
+            128,
+            7,
+            149,
+            164
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "ONE",
+          "bytes": [
+            147,
+            14,
+            135,
+            8,
+            141
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "TWO",
+          "bytes": [
+            8,
+            191,
+            162
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "THREE",
+          "bytes": [
+            8,
+            190,
+            148,
+            8,
+            128
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "FOUR",
+          "bytes": [
+            186,
+            7,
+            137,
+            153
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "FIVE",
+          "bytes": [
+            186,
+            157,
+            166
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "SIX",
+          "bytes": [
+            8,
+            187,
+            129,
+            14,
+            194,
+            7,
+            187
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "SEVEN",
+          "bytes": [
+            8,
+            187,
+            7,
+            131,
+            166,
+            131,
+            141
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "EIGHT",
+          "bytes": [
+            154,
+            4,
+            191
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "NINE",
+          "bytes": [
+            141,
+            14,
+            157,
+            141
+          ],
+          "source": "preserved Talko_SpeakJet 0.9.1"
+        },
+        {
+          "label": "TEN",
+          "phonemes": [
+            "TT",
+            "EH",
+            "NE"
+          ],
+          "source": "cmudict: ten"
+        },
+        {
+          "label": "ELEVEN",
+          "phonemes": [
+            "IH",
+            "LE",
+            "EH",
+            "VV",
+            "EY",
+            "NE"
+          ],
+          "source": "cmudict: eleven"
+        },
+        {
+          "label": "TWELVE",
+          "phonemes": [
+            "TT",
+            "WW",
+            "EH",
+            "LE",
+            "VV"
+          ],
+          "source": "cmudict: twelve"
+        },
+        {
+          "label": "THIRTEEN",
+          "phonemes": [
+            "DH",
+            "AXRR",
+            "TT",
+            "IY",
+            "IY",
+            "NE"
+          ],
+          "source": "cmudict: thirteen"
+        },
+        {
+          "label": "FOURTEEN",
+          "phonemes": [
+            "FF",
+            "AW",
+            "AW",
+            "RR",
+            "TT",
+            "IY",
+            "IY",
+            "NE"
+          ],
+          "source": "cmudict: fourteen"
+        },
+        {
+          "label": "FIFTEEN",
+          "phonemes": [
+            "FF",
+            "IH",
+            "FF",
+            "TT",
+            "IY",
+            "IY",
+            "NE"
+          ],
+          "source": "cmudict: fifteen"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Short transmissions",
+      "entries": [
+        {
+          "label": "ARE YOU READY",
+          "phonemes": [
+            "AW",
+            "RR",
+            "P4",
+            "IYEH",
+            "UW",
+            "UW",
+            "P4",
+            "RR",
+            "EH",
+            "ED",
+            "IY"
+          ],
+          "source": "cmudict: are you ready"
+        },
+        {
+          "label": "SYSTEM ONLINE",
+          "phonemes": [
+            "SE",
+            "IH",
+            "SE",
+            "TT",
+            "EY",
+            "MM",
+            "P4",
+            "AW",
+            "AW",
+            "NE",
+            "LE",
+            "OHIH",
+            "NE"
+          ],
+          "source": "cmudict: system online"
+        },
+        {
+          "label": "SYSTEM FAILURE",
+          "phonemes": [
+            "SE",
+            "IH",
+            "SE",
+            "TT",
+            "EY",
+            "MM",
+            "P4",
+            "FF",
+            "EYIY",
+            "LE",
+            "IYEH",
+            "AXRR"
+          ],
+          "source": "cmudict: system failure"
+        },
+        {
+          "label": "ACCESS DENIED",
+          "phonemes": [
+            "AY",
+            "KE",
+            "SE",
+            "EH",
+            "SE",
+            "P4",
+            "ED",
+            "IH",
+            "NE",
+            "OHIH",
+            "ED"
+          ],
+          "source": "cmudict: access denied"
+        },
+        {
+          "label": "HELLO HUMAN",
+          "phonemes": [
+            "HE",
+            "EY",
+            "LE",
+            "OW",
+            "OW",
+            "P4",
+            "HE",
+            "IYEH",
+            "UW",
+            "UW",
+            "MM",
+            "EY",
+            "NE"
+          ],
+          "source": "cmudict: hello human"
+        },
+        {
+          "label": "WE ARE ROBOTS",
+          "phonemes": [
+            "WW",
+            "IY",
+            "IY",
+            "P4",
+            "AW",
+            "RR",
+            "P4",
+            "RR",
+            "OW",
+            "OW",
+            "EB",
+            "AW",
+            "TT",
+            "SE"
+          ],
+          "source": "cmudict: we are robots"
+        },
+        {
+          "label": "MAKE SOME NOISE",
+          "phonemes": [
+            "MM",
+            "EYIY",
+            "KE",
+            "P4",
+            "SE",
+            "UX",
+            "MM",
+            "P4",
+            "NE",
+            "OWIY",
+            "ZZ"
+          ],
+          "source": "cmudict: make some noise"
+        },
+        {
+          "label": "FOLLOW THE RHYTHM",
+          "phonemes": [
+            "FF",
+            "AW",
+            "LE",
+            "OH",
+            "P4",
+            "DH",
+            "EY",
+            "P4",
+            "RR",
+            "IH",
+            "DH",
+            "EY",
+            "MM"
+          ],
+          "source": "cmudict: follow the rhythm"
+        },
+        {
+          "label": "LOST IN SPACE",
+          "phonemes": [
+            "LE",
+            "AW",
+            "AW",
+            "SE",
+            "TT",
+            "P4",
+            "IH",
+            "NE",
+            "P4",
+            "SE",
+            "PO",
+            "EYIY",
+            "SE"
+          ],
+          "source": "cmudict: lost in space"
+        },
+        {
+          "label": "TAKE ME HOME",
+          "phonemes": [
+            "TT",
+            "EYIY",
+            "KE",
+            "P4",
+            "MM",
+            "IY",
+            "IY",
+            "P4",
+            "HE",
+            "OW",
+            "OW",
+            "MM"
+          ],
+          "source": "cmudict: take me home"
+        },
+        {
+          "label": "DO NOT PANIC",
+          "phonemes": [
+            "ED",
+            "UW",
+            "UW",
+            "P4",
+            "NE",
+            "AW",
+            "TT",
+            "P4",
+            "PO",
+            "AY",
+            "NE",
+            "IH",
+            "KE"
+          ],
+          "source": "cmudict: do not panic"
+        },
+        {
+          "label": "THANK YOU",
+          "phonemes": [
+            "DH",
+            "AY",
+            "NGE",
+            "KE",
+            "P4",
+            "IYEH",
+            "UW",
+            "UW"
+          ],
+          "source": "cmudict: thank you"
+        },
+        {
+          "label": "GOOD MORNING",
+          "phonemes": [
+            "GE",
+            "UH",
+            "UH",
+            "ED",
+            "P4",
+            "MM",
+            "AW",
+            "AW",
+            "RR",
+            "NE",
+            "IH",
+            "NGE"
+          ],
+          "source": "cmudict: good morning"
+        },
+        {
+          "label": "SEE YOU LATER",
+          "phonemes": [
+            "SE",
+            "IY",
+            "IY",
+            "P4",
+            "IYEH",
+            "UW",
+            "UW",
+            "P4",
+            "LE",
+            "EYIY",
+            "TT",
+            "AXRR"
+          ],
+          "source": "cmudict: see you later"
+        },
+        {
+          "label": "TRANSMISSION ENDED",
+          "phonemes": [
+            "TT",
+            "RR",
+            "AY",
+            "NE",
+            "SE",
+            "MM",
+            "IH",
+            "SH",
+            "EY",
+            "NE",
+            "P4",
+            "EH",
+            "NE",
+            "ED",
+            "EY",
+            "ED"
+          ],
+          "source": "cmudict: transmission ended"
+        },
+        {
+          "label": "END OF LINE",
+          "phonemes": [
+            "EH",
+            "NE",
+            "ED",
+            "P4",
+            "UX",
+            "VV",
+            "P4",
+            "LE",
+            "OHIH",
+            "NE"
+          ],
+          "source": "cmudict: end of line"
+        }
+      ]
+    }
+  ]
+}
