@@ -4,6 +4,9 @@ Speech and sound firmware for the **Polaxis Talko 2 (RP2040)**, based on
 SpeakJet. Version **0.9.3** has 14 banks, 347 selections, live pitch/speed,
 effects, ERROR freeze and native phoneme blending in Queue mode.
 
+[User manual](https://www.polaxis.be/talko-speakjet-user-manual/) ·
+[Firmware catalogue and browser installer](https://www.polaxis.be/talko-alternative-firmwares/).
+
 ## Install
 
 1. Download [Talko_SpeakJet-0.9.3.uf2](firmware/Talko_SpeakJet-0.9.3.uf2).
