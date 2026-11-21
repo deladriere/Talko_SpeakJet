@@ -1,13 +1,13 @@
 # Development
 
-The normal release is Talko_SpeakJet **0.9.3** for RP2040, using a maintained
-port of Andrew Davie’s [SpeakJet 0.4.3](https://github.com/andrew-davie/SpeakJet/tree/ea2935018ed8ee90becb28b48fc2c83d03f683fe).
+The normal release is Talko_SpeakJet **1.0** for RP2040, using a maintained
+port of Andrew Davie’s [SpeakJet 0.5.5](https://github.com/andrew-davie/SpeakJet/tree/b05428e95fb1e2f3dba4fb7a62f9f89320364e49).
 These notes preserve the port’s behavior and optimizations during engine updates.
 
 ## Talko-specific implementation: preserve during upstream updates
 
-The Talko firmware version (currently **Talko_SpeakJet 0.9.3**) is separate
-from the embedded SpeakJet engine version (**0.4.3**). This is a maintained
+The Talko firmware version (currently **Talko_SpeakJet 1.0**) is separate
+from the embedded SpeakJet engine version (**0.5.5**). This is a maintained
 RP2040 port, not an unmodified copy of the desktop emulator.
 
 | Area | Talko adaptation and reason |
@@ -15,7 +15,7 @@ RP2040 port, not an unmodified copy of the desktop emulator.
 | Synthesis arithmetic | `float` state, float math functions and `-fsingle-precision-constant` avoid the upstream double-precision synthesis cost on RP2040. |
 | Oscillators | `speakjet_sine.h` supplies a quarter-wave lookup for a 4096-step cycle. Oscillator phases stay bounded during long effects and repeats. |
 | Audio rate and output stage | `SJ_SAMPLE_RATE=8026`, matching the emulator's measured native chip tick. The analogue output model is advanced once per held sample with cached pole coefficients. Do not restore upstream's 48 kHz renderer accidentally. |
-| Expensive calculations | Master volume gain is cached until Volume changes. Exact coefficients of stationary noise bands are cached. C8/C9 noise-filter sweeps are prepared once in `sj_new()` and survive `sj_power_on()` resets. |
+| Expensive calculations | Master volume gain is cached until Volume changes. Exact coefficients of stationary noise bands are cached. C8/C9 noise-filter sweeps are prepared once in `sj_new()` and survive `sj_power_on()` resets. Continuous oscillator glides use a cheap bound before the 25% leap check. Geometric sweeps cache their log ratios per segment. Recheck ALARM_7 on hardware when changing either path. |
 | RAM placement | `SJ_TALKO_RP2040` places the renderer and sine table in time-critical RAM sections. Keep the library flags in `library.json`. |
 | Core ownership | Core 1 owns the emulator, FIFO writes and rendering. Core 0 handles the panel, USB and PWM interrupt. Keep its panel/USB loop at about 1 kHz: an unrestricted loop contends with the renderer for shared memory and caused underruns. Encoder/gate edges remain interrupt-driven. Never access one emulator concurrently from both cores. |
 | Audio buffering | 64-sample blocks; 1024-sample duty ring; 128-sample startup prefill. All modes limit rendering ahead to 192 samples (about 24 ms), keeping pitch, speed, FX and ERROR responsive. Native Queue flow control stops feeding at Buffer Half Full (>32 bytes). |
@@ -119,7 +119,7 @@ Install `pyserial` for device measurements, close other serial clients, and
 supply the intended board’s USB serial number:
 
 ```sh
-python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output reports/0.9.3
+python3 scripts/bench_serial.py --serial-id YOUR_TALKO_SERIAL --output reports/1.0
 ```
 
 Add `--quick` for a shorter scan. This makes sound and changes playback; it does
@@ -148,8 +148,9 @@ logs belong under `reports/`, not among the source files.
   `4bba1baf69f9fd55c4a2023a88f77b87657e6361`).
 - `fb4abd7`: 0.9.1 live controls, FX/ERROR, FIFO flow control and panel scheduling.
 - `760d5cb`: 0.9.3, restored Emy groups and labels-only default serial.
+- 1.0 uses upstream commit `b05428e95fb1e2f3dba4fb7a62f9f89320364e49`. The runtime uses native-rate PWM and two-digit version announcements. The new effect decoder and table must be updated together. The port includes deterministic seeding and uses a fixed native-rate output stage. Upstream’s selectable 48 kHz clean/AtariVox output is a desktop feature. Live Queue rebuilds from the saved start of an allophone and carries accepted cross-boundary formant timing into the next sound.
 
 Queue follows the native MSA/FIFO model described in the
 [Emy/SpeakJet reference](https://www.polaxis.be/product/speakjet-vox/).
 See [bank editing](../banks/README.md), [release images](../firmware/README.md)
-and [release validation](VALIDATION.md) for the current snapshot.
+and [release validation](VALIDATION-1.0.md) for the current snapshot.

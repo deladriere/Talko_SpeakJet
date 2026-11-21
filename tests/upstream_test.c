@@ -232,14 +232,21 @@ static void test_names(void) {
 
 /* the tables' size budget: the library's brief is a few bytes per sound, and every field only some sounds use goes
  * in the effects' optional fields or a side table, never a fixed column (2606 bytes when this test was written) */
-#define TABLE_BUDGET 5000
+#define TABLE_BUDGET 8192
 static void test_table_size(void) {
-  const size_t n = sizeof allophones + sizeof allog + sizeof fxdata + sizeof fxat;
+  const size_t n = sizeof allophones + sizeof allog + sizeof alloj + sizeof fxdata + sizeof fxat + sizeof fxs + sizeof fxeq;
   if (n > TABLE_BUDGET)
     FAIL("the tables are %zu bytes, over the %d-byte budget", n, TABLE_BUDGET);
 }
 
 int main(void) {
+  /* An effect code can be the predecessor of any speech sound. */
+  sj_chip *mixed = sj_new();
+  sj_write_byte(mixed, 254);
+  sj_write_byte(mixed, 128);
+  float block[64];
+  while (sj_render(mixed, block, 64)) {}
+  sj_free(mixed);
   test_table_size();
   test_sounds();
   test_phrase_length();

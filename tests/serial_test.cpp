@@ -16,7 +16,7 @@ int main(){
  // STOP as a vocabulary label is retained; automatic end markers are omitted.
  label(0,9);stop();label(13,0);stop();pump();assert(Serial.output=="STOP\r\nDTMF_0\r\n");Serial.output.clear();
  Report report{{0,0,0,PlaybackMode::Speech},Event::Done};assert(queue_try_add(&reports,&report));pump();assert(Serial.output.empty());
- command("STATUS");assert(Serial.output.find("Talko_SpeakJet 0.9.3 build=normal")!=std::string::npos);assert(Serial.output.find("PANEL ")!=std::string::npos);Serial.output.clear();
+ command("STATUS");assert(Serial.output.find("Talko_SpeakJet 1.0 build=normal")!=std::string::npos);assert(Serial.output.find("PANEL ")!=std::string::npos);Serial.output.clear();
  pump();setPanelControls(controls,true);pump();assert(Serial.output.empty());
  command("STATS ON");assert(queue_try_add(&reports,&report));stop();pump();assert(Serial.output.find("RESULT ")!=std::string::npos);assert(Serial.output.find("STOP\r\n")!=std::string::npos);Serial.output.clear();
  // Disconnect restores the labels-only default even after diagnostic use.

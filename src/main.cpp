@@ -86,7 +86,7 @@ void setup(){
   }
   analogReadResolution(12);soundPot.begin();pitch.begin();speed.begin();fx.begin();
   setupAudio();
-  TalkoStartup::showVersion(VersionMajor,VersionMinor,startupDraw,sayStartupPart,audioBusy,VersionPatch);
+  TalkoStartup::showVersion(VersionMajor,VersionMinor,startupDraw,sayStartupPart,audioBusy);
   delay(25);lastEncoder=encoderState();
   attachInterrupt(digitalPinToInterrupt(EncoderA),encoderInterrupt,CHANGE);
   attachInterrupt(digitalPinToInterrupt(EncoderB),encoderInterrupt,CHANGE);

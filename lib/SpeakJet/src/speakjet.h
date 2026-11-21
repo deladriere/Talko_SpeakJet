@@ -42,9 +42,9 @@ extern "C" {
 
 /* library version */
 #define SJ_VERSION_MAJOR 0
-#define SJ_VERSION_MINOR 4
-#define SJ_VERSION_PATCH 3
-#define SJ_VERSION "0.4.3"
+#define SJ_VERSION_MINOR 5
+#define SJ_VERSION_PATCH 5
+#define SJ_VERSION "0.5.5"
 
 /* Native measured SpeakJet tick rate, also used for Talko output. */
 #define SJ_SAMPLE_RATE 8026
@@ -95,6 +95,9 @@ int sj_buffered(const sj_chip *sj);
  * cleared and the controls return to their defaults. the sound already
  * playing is not cut short. a half received two byte command is dropped */
 void sj_reset(sj_chip *sj);
+
+/* Set the initial noise sequence and oscillator phases. */
+void sj_seed(sj_chip *sj, uint32_t seed);
 
 /* fill buf with the next n samples of output, at SJ_SAMPLE_RATE, in the
  * range -1 to 1. returns true if the chip is producing sound */

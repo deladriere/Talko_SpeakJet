@@ -2,13 +2,13 @@ from pathlib import Path
 import serial,serial.tools.list_ports,time,re,json,sys,argparse
 parser=argparse.ArgumentParser()
 parser.add_argument("--serial-id",required=True)
-parser.add_argument("--output",type=Path,default=Path("reports/0.9.3"))
+parser.add_argument("--output",type=Path,default=Path("reports/1.0"))
 parser.add_argument("--quick",action="store_true")
 args=parser.parse_args()
 out=args.output;out.mkdir(parents=True,exist_ok=True)
 ports=[p for p in serial.tools.list_ports.comports() if p.serial_number==args.serial_id]
 assert len(ports)==1
-assert ports[0].product=='Talko_SpeakJet 0.9.3',ports[0].product
+assert ports[0].product=='Talko_SpeakJet 1.0',ports[0].product
 s=serial.Serial(ports[0].device,115200,timeout=.1)
 log=[];results=[]
 def read_until(predicate,timeout=25):
@@ -37,14 +37,14 @@ def run(command,timeout=25):
 try:
     s.write(b'STATS ON\nSTATUS\n')
     banner=read_until(lambda l:l.startswith('Talko_SpeakJet'))
-    assert 'engine=0.4.3' in banner
+    assert 'engine=0.5.5' in banner
     if '--quick' not in sys.argv:
         counts=[16,16,16,16,16,16,16,12,54,12,18,72,55,12]
         for bank,count in enumerate(counts):
             for item in range(1,count+1):run(f'PLAY {bank} {item}')
             print('Completed bank',bank,'total',len(results),flush=True)
     else:
-        for b,i in ((0,1),(1,16),(2,10),(3,12),(4,16),(5,1),(5,16),(6,15),(12,39),(12,40),(12,55),(13,12)):
+        for b,i in ((0,1),(1,16),(2,10),(3,12),(4,16),(5,1),(5,16),(6,15),(12,18),(12,39),(12,40),(12,55),(13,12)):
             run(f'PLAY {b} {i}')
     for seq in ('128 137','141 179 137','132 191 132','187 187','132 8 187 8 187 134',
                 '21 108 141 179 137','21 118 128 147 129','132 2 132'):

@@ -1,15 +1,17 @@
 # Talko_SpeakJet
 
 Speech and sound firmware for the **Polaxis Talko 2 (RP2040)**, based on
-SpeakJet. Version **0.9.3** has 14 banks, 347 selections, live pitch/speed,
+SpeakJet. Version **1.0** has 14 banks, 347 selections, live pitch/speed,
 effects, ERROR freeze and native phoneme blending in Queue mode.
 
 [User manual](https://www.polaxis.be/talko-speakjet-user-manual/) ·
 [Firmware catalogue and browser installer](https://www.polaxis.be/talko-alternative-firmwares/).
 
+The 1.0 engine updates phoneme transitions and effect timing. To reproduce the earlier sound, use the [0.9.3 image](firmware/Talko_SpeakJet-0.9.3.uf2).
+
 ## Install
 
-1. Download [Talko_SpeakJet-0.9.3.uf2](firmware/Talko_SpeakJet-0.9.3.uf2).
+1. Download [Talko_SpeakJet-1.0.uf2](firmware/Talko_SpeakJet-1.0.uf2).
 2. Connect Talko by USB. Hold **BOOTSEL**, press and release **RESET**, then
    release BOOTSEL when the `RPI-RP2` drive appears.
 3. Copy the UF2 to that drive. Talko restarts and announces its version.
@@ -65,7 +67,7 @@ order. The display continues after 9 with **A, b, C, d**.
 
 ## USB serial
 
-The USB name is **Talko_SpeakJet 0.9.3**. Normal output is only the spoken
+The USB name is **Talko_SpeakJet 1.0**. Normal output is only the spoken
 label, one line per utterance, including repeated Queue selections.
 [Optional developer commands and Console animation](docs/DEVELOPMENT.md#serial-interface).
 
@@ -82,11 +84,11 @@ SANITIZE=1 sh tests/run_host.sh
 The tests use Python 3 and a C/C++ compiler. The bank generator is checked by
 the host suite. See [development notes](docs/DEVELOPMENT.md) for hardware pins,
 architecture and preserving the Talko adaptations during upstream updates.
-[0.9.3 validation summary](docs/VALIDATION.md).
+[1.0 bench results](docs/VALIDATION-1.0.md).
 
 ## Credits
 
-Emulator: Andrew Davie’s [SpeakJet 0.4.3](https://github.com/andrew-davie/SpeakJet/tree/ea2935018ed8ee90becb28b48fc2c83d03f683fe),
+Emulator: Andrew Davie’s [SpeakJet 0.5.5](https://github.com/andrew-davie/SpeakJet/tree/b05428e95fb1e2f3dba4fb7a62f9f89320364e49),
 with an RP2040 port and Talko controls. [Upstream MIT notice](lib/SpeakJet/LICENSE).
 The original phoneme grouping and number dictionary come from Polaxis Emy.
 New vocabulary uses CMU-derived SpeakJet pronunciations; [dictionary notice](banks/CMUDICT-LICENSE).

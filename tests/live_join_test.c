@@ -51,7 +51,7 @@ int main(void) {
   sj_power_on(b);
   const uint8_t repeat[]={26,2,128};feed(b,repeat,3);
   do { sj_render(b,y,1); } while (b->copies > 0);
-  assert(b->sounding && b->join_context.repeated);
+  assert(b->sounding && b->repeated_command);
   memcpy(before,b->seg,sizeof(before));
   feed(b,&ow,1);sj_join_pending(b);
   assert(!b->joined && !memcmp(before,b->seg,sizeof(before)));

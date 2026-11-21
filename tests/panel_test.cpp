@@ -7,7 +7,7 @@ namespace TalkoStartup {
 constexpr uint8_t Digits[]={0x3f,6,0x5b,0x4f,0x66,0x6d,0x7d,7,0x7f,0x6f};
 inline void prepareLed(){}
 inline void setLed(uint32_t){}
-inline void showVersion(uint8_t,uint8_t,void(*)(uint8_t),void(*)(uint8_t),bool(*)(),int){}
+inline void showVersion(uint8_t,uint8_t,void(*)(uint8_t),void(*)(uint8_t),bool(*)(),int=-1){}
 }
 #define TALKO_PANEL_HOST
 #include "../src/main.cpp"
